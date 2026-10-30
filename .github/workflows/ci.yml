@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   validate:
-    name: Repository validation
+    name: Validate SwarmForge package
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -23,5 +23,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Validate starter configuration
+      - name: Validate Skill and repository configuration
         run: python3 scripts/validate.py
+
+      - name: Run package smoke tests
+        run: python3 -m unittest discover -s tests -v

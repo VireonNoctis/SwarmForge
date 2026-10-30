@@ -1,46 +1,48 @@
-# Project Setup Checklist
+# Skill Development and Validation
 
-Use this checklist when creating a project from the template. Delete or adapt sections that do not apply.
+SwarmForge is a portable Agent Skill. This document is for maintaining this repository; it is not a setup guide for a separate runtime.
 
-## Identity and ownership
+## Install and use
 
-- [ ] Set the repository and application name.
-- [ ] Replace the template README with the product's purpose, features, screenshots or examples, and actual usage instructions.
-- [ ] Add the maintainer or organization details.
-- [ ] Choose a license deliberately and add the complete license text. This template does not choose one for you.
-- [ ] Decide whether the project is public, private, or internal.
+Install the repository root as a Skill using the path documented by your AI host. The root must remain together with `SKILL.md` and the supporting files it references.
 
-## Technology
+See:
+- [Installation](INSTALLATION.md)
+- [Platform compatibility](PLATFORM_COMPATIBILITY.md)
 
-- [ ] Choose supported language and runtime versions.
-- [ ] Choose one package manager and commit its lockfile.
-- [ ] Add the actual project structure and entry points.
-- [ ] Document reproducible installation, development, build, and test commands.
-- [ ] Add formatting, linting, type checking, and tests for the selected stack.
-- [ ] Update `.devcontainer/devcontainer.json` with project-specific tools, services, ports, and extensions.
-- [ ] Add any required environment variable names to `.env.example`, using safe sample values only.
+No compiled binary, package manager, API key, database, or external service is required to install or use the portable Skill. Live delegation depends on the capabilities the host exposes.
 
-## Continuous integration
+## Validate the package
 
-- [ ] Extend `.github/workflows/ci.yml` with the real build and test commands.
-- [ ] Test the workflow on a pull request before making it a required check.
-- [ ] Keep third-party Actions pinned to full commit SHAs and let Dependabot propose updates.
-- [ ] Add release, deployment, and artifact workflows only when the project needs them.
+Maintainers need Python 3 to run the standard-library validation tools:
 
-## Repository security and maintenance
+~~~bash
+python3 scripts/validate.py
+python3 -m unittest discover -s tests -v
+~~~
 
-- [ ] Enable Dependabot alerts and dependency updates.
-- [ ] Enable secret scanning and push protection when available for the repository.
-- [ ] Enable private vulnerability reporting.
-- [ ] Review the OpenSSF Scorecard report and address relevant findings.
-- [ ] Protect the default branch with a ruleset or branch protection policy.
-- [ ] Require review and passing checks appropriate to the project's risk.
-- [ ] Store deployment credentials in GitHub Actions or the target platform's secret manager.
-- [ ] Review the permissions granted to every workflow and third-party Action.
+Python is used only for package validation. It is not part of the Skill's runtime and is not required by users of the Skill.
 
-## Remove template-only material
+The GitHub Actions workflow runs the same package checks on pushes and pull requests. Passing these checks validates package structure and smoke tests; it does not prove compatibility with every AI host or demonstrate 500 concurrent sessions.
 
-- [ ] Replace this checklist with project-specific onboarding instructions.
-- [ ] Update `AGENTS.md` with real commands, architecture boundaries, and repository-specific constraints.
-- [ ] Remove tools or community files that do not fit the project.
-- [ ] Check links, examples, and badges after renaming the repository.
+## Optional external integrations
+
+Do not create a backend as part of routine Skill installation or maintenance. If a separate external integration is explicitly approved, start with [Execution modes](EXECUTION_MODES.md) and [Adapter contract](ADAPTER_CONTRACT.md). Keep the integration optional and separate from the portable Skill.
+
+## Preferred languages for a separately approved companion
+
+The Skill itself has no language requirement. If future work explicitly calls for a separate implementation:
+
+- **Rust** is the preferred language for the coordinator, scheduler, and worker lifecycle.
+- **C++** is reserved for focused native integrations or performance-critical components with a demonstrated need.
+- **Next.js** is reserved for an optional web interface that is separately requested.
+
+Do not introduce these runtimes or a dashboard into this repository just to make the Skill installable. Any companion application should remain independently deployable and must not be required for the core Skill workflow.
+
+## Before making capability claims
+
+Check current official documentation for the specific host surface. Distinguish:
+- Skill discovery from agent-spawning capability;
+- a configured integration from one merely described in documentation;
+- a queued task from an active worker session;
+- design targets from measured runtime capacity.

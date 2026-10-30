@@ -1,0 +1,6 @@
+interface:
+  display_name: "SwarmForge"
+  short_description: "Coordinate multi-agent engineering work"
+  default_prompt: "Use SwarmForge to plan this engineering task, delegate independent work to available agents, integrate the results, and verify the final changes."
+policy:
+  allow_implicit_invocation: true
