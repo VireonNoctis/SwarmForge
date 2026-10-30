@@ -26,6 +26,7 @@ These instructions apply across this repository. More specific instructions in a
 - Run the project's formatter, linter, type checker, and tests when they exist.
 - Add or update tests when behavior changes.
 - Review the final diff for unintended files, generated artifacts, secrets, and unrelated edits.
+- Do not Create a Pull Request unless the implementation is massive throughout multiple files equating to 5000+ Lines.
 - State exactly which checks were run and which were not. Never report an unexecuted check as passing.
 
 ## Documentation
