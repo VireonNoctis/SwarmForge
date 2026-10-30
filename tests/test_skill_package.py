@@ -27,6 +27,21 @@ class SkillPackageTests(unittest.TestCase):
         self.assertTrue(path.is_file())
         self.assertTrue(path.read_text(encoding="utf-8").startswith("---\n"))
 
+    def test_worker_limit_gate_precedes_delegation(self) -> None:
+        text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        gate = text.index("## 0. Establish the worker limit before dispatch")
+        discovery = text.index("## 1. Discover real delegation capabilities")
+        self.assertLess(gate, discovery)
+        self.assertIn("How many agents would you like to run for this task?", text)
+        self.assertIn("wait for the answer", text)
+        self.assertIn("maximum number of worker agents", text)
+
+    def test_board_meeting_requires_real_participants_or_fallback(self) -> None:
+        text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("## 2. Establish the engineering board", text)
+        self.assertIn("Never fabricate attendees", text)
+        self.assertIn("board unavailable — single-agent assessment", text)
+
     def test_skill_metadata_names_the_skill(self) -> None:
         text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("name: swarmforge", text)
