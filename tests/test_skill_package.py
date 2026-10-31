@@ -42,6 +42,34 @@ class SkillPackageTests(unittest.TestCase):
         self.assertIn("Never fabricate attendees", text)
         self.assertIn("board unavailable — single-agent assessment", text)
 
+    def test_task_graph_has_session_scoped_ids_and_explicit_lifecycle(self) -> None:
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        patterns = (ROOT / "docs" / "ORCHESTRATION_PATTERNS.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("task contract in `docs/ORCHESTRATION_PATTERNS.md`", skill)
+        for field in (
+            "session_id:",
+            "owner:",
+            "context_refs:",
+            "read_paths:",
+            "write_paths:",
+            "depends_on:",
+            "acceptance_criteria:",
+            "verification_commands:",
+            "deliverable:",
+            "worker_session_id: null",
+            "worker_status: null",
+        ):
+            with self.subTest(field=field):
+                self.assertIn(field, patterns)
+        self.assertIn("unique session ID", patterns)
+        self.assertIn("reject cycles", patterns)
+        self.assertIn("queued dispatch is not an active task", patterns)
+        self.assertIn("completed", patterns)
+        self.assertIn("failed", patterns)
+        self.assertIn("cancelled", patterns)
+
     def test_skill_metadata_names_the_skill(self) -> None:
         text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("name: swarmforge", text)

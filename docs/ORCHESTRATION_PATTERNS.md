@@ -36,6 +36,53 @@ Best for large projects with clear domains. All descendants must debit one globa
 
 Tasks run only when dependencies are complete: repository analysis → interface design → implementation → integration → tests → independent review. Best for tightly dependent changes where speculative parallel work would create rework.
 
+## Task graph and task registry
+
+For every substantial task, keep one compact project brief and a session-local task registry. Use the host's native task list or session notes when available; otherwise keep the registry in the coordinator's working context. **Do not add a database, service, or persistent scheduler just to track tasks.**
+
+Generate a unique session ID for each invocation, then number tasks within it (for example, `sf-20261031-x7k2-01`). A date alone is not a unique session ID. Each task must have exactly one accountable owner: the coordinator or a real, host-issued worker-session ID. A role name, planned worker, or queued job is not an owner.
+
+Use this compact record:
+
+~~~yaml
+session_id: "sf-20261031-x7k2"
+objective: "Deliver the user's requested outcome"
+requested_worker_cap: "<user-provided maximum>"
+tasks:
+  - id: "sf-20261031-x7k2-01"
+    owner: "coordinator"
+    objective: "Inspect the existing task lifecycle and identify the smallest safe change"
+    context_refs:
+      - "SKILL.md"
+      - "docs/ORCHESTRATION_PATTERNS.md"
+    read_paths:
+      - "docs/ORCHESTRATION_PATTERNS.md"
+      - "tests/test_skill_package.py"
+    write_paths: []
+    depends_on: []
+    status: "ready"
+    acceptance_criteria:
+      - "Findings cite exact paths and identify a bounded implementation"
+    verification_commands:
+      - "python3 -m unittest discover -s tests -v"
+    deliverable: "Evidence-backed implementation brief"
+    worker_session_id: null
+    worker_status: null
+    result_ref: null
+~~~
+
+The cap is optional when the user has not supplied one; never infer host capacity from a requested cap. Keep references narrow and use repository-relative paths. Add fields only when they improve coordination.
+
+### Graph and ownership rules
+
+- Task IDs are unique within the session. Every dependency must reference an existing task; reject cycles before dispatch.
+- A task is `planned` while prerequisites remain, `ready` when all dependencies are complete, `active` only after its owner actually begins, `blocked` when it cannot safely proceed, and `completed`, `failed`, or `cancelled` only with an explicit outcome.
+- A failed or cancelled dependency blocks its dependants until the coordinator deliberately revises the graph and records the reason. Do not silently treat failure as completion.
+- Keep task status separate from worker-session status. A queued dispatch is not an active task or a confirmed active agent; populate `worker_session_id` and `worker_status` only from host-confirmed session data.
+- Default to read-only tasks. Concurrent write paths must not overlap. Serialize shared-file work or reserve those paths for the coordinator; never rely on a role label as a file lock.
+- Mark a task complete only after its deliverable exists, its acceptance criteria are checked, and the coordinator has inspected the evidence. Record failed checks and unresolved risks in the result.
+
+
 ## Map / reduce
 
 Map a common operation across independent files, records, or modules; reduce normalized results into a deduplicated, evidence-preserving summary. Best for migrations, audits, large test collections, and bulk analysis. Validate the transformation on a small sample first.

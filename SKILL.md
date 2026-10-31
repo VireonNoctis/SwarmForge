@@ -79,8 +79,8 @@ The number of planned tasks is not the number of active agents. The host's actua
 
 1. Read repository instructions such as `AGENTS.md`, current branch/worktree state, relevant source, tests, and existing conventions.
 2. Convert the request into clear outcomes and acceptance criteria.
-3. Create a dependency-aware task graph. Separate discovery, design, implementation, verification, and integration.
-4. Give every task one owner, bounded scope, relevant context, allowed read/write paths, dependencies, and a concrete deliverable.
+3. Create one compact project brief and dependency-aware task graph using the task contract in `docs/ORCHESTRATION_PATTERNS.md`. Give tasks unique session-scoped IDs and verify that every dependency exists and the graph is acyclic before dispatch.
+4. Give each task exactly one accountable owner, a measurable objective, context/source references, explicit read/write paths, dependencies, acceptance criteria, verification commands, and a concrete deliverable. Track task state separately from worker-session state.
 5. Assign file ownership before concurrent editing. Prefer read-only research first.
 6. Keep final integration and verification under coordinator ownership.
 

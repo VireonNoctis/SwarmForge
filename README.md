@@ -108,7 +108,7 @@ This repository contains the portable Skill, optional host metadata, documentati
 | Supported host surfaces | [Platform compatibility](docs/PLATFORM_COMPATIBILITY.md) |
 | Product boundaries | [Architecture](docs/ARCHITECTURE.md) |
 | Native and optional execution paths | [Execution modes](docs/EXECUTION_MODES.md) |
-| Coordination patterns | [Orchestration patterns](docs/ORCHESTRATION_PATTERNS.md) |
+| Coordination patterns and task governance | [Orchestration patterns](docs/ORCHESTRATION_PATTERNS.md) |
 | 500-session capacity model | [Scaling to 500](docs/SCALING_TO_500.md) |
 | Optional integrations | [Adapter contract](docs/ADAPTER_CONTRACT.md) |
 | Permissions and isolation | [Security model](docs/SECURITY_MODEL.md) |
