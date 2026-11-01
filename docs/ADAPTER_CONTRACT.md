@@ -62,6 +62,20 @@ evidence:
     constraints: "confirmed scope, permission, or limit"
 ~~~
 
+The normalized capability IDs are not tool names. Map them to the concrete operations exposed by the integration; for example:
+
+| Normalized capability | Example logical operation |
+|---|---|
+| `worker.create` | `create_worker` |
+| `worker.observe` | `get_worker` and/or `wait_worker` |
+| `worker.collect_result` | `collect_result` |
+| `worker.cancel` | `cancel_worker` |
+| `worker.message` | `send_message` |
+| `workspace.isolate` | `create_workspace` |
+| `workspace.release` | `release_workspace` |
+
+These names are illustrative mappings only. Confirm that the actual operation's schema and returned data satisfy the capability before marking it supported.
+
 The snapshot is advisory session state. Do not persist secrets, credentials, full prompts, or private source content in it.
 
 ### Dispatch and degradation rules
