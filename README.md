@@ -110,7 +110,7 @@ This repository contains the portable Skill, optional host metadata, documentati
 | Native and optional execution paths | [Execution modes](docs/EXECUTION_MODES.md) |
 | Coordination patterns and task governance | [Orchestration patterns](docs/ORCHESTRATION_PATTERNS.md) |
 | 500-session capacity model | [Scaling to 500](docs/SCALING_TO_500.md) |
-| Optional integrations | [Adapter contract](docs/ADAPTER_CONTRACT.md) |
+| Capability discovery and optional integrations | [Adapter contract](docs/ADAPTER_CONTRACT.md) |
 | Permissions and isolation | [Security model](docs/SECURITY_MODEL.md) |
 | Example workflows | [Workflows](docs/WORKFLOWS.md) |
 | Maintainer setup and checks | [Project setup](docs/PROJECT_SETUP.md) |

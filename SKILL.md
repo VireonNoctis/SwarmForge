@@ -45,6 +45,34 @@ Classify the environment as one of:
 
 Prefer native host capabilities. Use an external integration only when it is already configured, visible, and authorized for this task. Do not invent tool names, API routes, CLI flags, MCP schemas, permissions, quotas, or provider capabilities.
 
+### Capability snapshot and dispatch gate
+
+Build a compact, session-local capability snapshot before dispatch. Inspect the tools and exact schemas currently exposed, their permission boundaries, and any confirmed host limits. Do not make calls that create workers or consume provider budget merely to probe availability. For each capability, record `supported`, `unsupported`, or `unknown`, with the exact tool/surface and evidence. Treat `unknown` as unavailable for any decision that depends on it.
+
+Check these capabilities independently:
+
+- `worker.create`: create a real model-worker session and return its host-issued session ID.
+- `worker.observe`: inspect worker status or wait for a terminal event.
+- `worker.collect_result`: retrieve the originating worker's result or patch.
+- `worker.cancel`: request cancellation and observe whether it took effect.
+- `worker.message`: send a scoped follow-up to an existing worker.
+- `team.create`, `team.message`, and `team.shared_state`: create and coordinate a real team; do not infer these from subagent support.
+- `workspace.isolate` and `workspace.release`: create and clean up isolated write environments.
+- `capacity.global_limit`, `capacity.nested_accounting`, `capacity.provider_limits`, and `capacity.current_usage`: establish the real global and per-provider admission limits.
+- `usage.token_cost_rate_limit`: inspect token, cost, and rate-limit telemetry when exposed.
+
+A host is **dispatch-ready** only when `worker.create`, `worker.observe`, and `worker.collect_result` are all supported, and creation returns a stable session ID. If any is missing or unknown, do not dispatch workers; use the single-agent fallback. An accepted request is not proof that a worker is running.
+
+Apply the following safety gates:
+
+- Without confirmed global and nested-session accounting, do not create nested supervisors or scale beyond one worker at a time.
+- Without cancellation, restrict any delegation to short, bounded, read-only work that does not depend on stopping a worker mid-task; disclose the limitation.
+- Permit concurrent writes only with isolated workspaces or explicit non-overlapping write ownership and serialized integration.
+- Do not claim a quota, budget, usage figure, or cancellation success unless the host exposes evidence for it.
+- Count a worker only after its session ID and active state are confirmed by the host. Keep task status separate from worker-session status.
+
+Provider/ecosystem labels describe task-relevant capabilities in this session, not general product availability. A provider is not a usable worker integration merely because its product, model, or API is documented or named in configuration.
+
 Record confirmed concurrency limits, whether nested agents share the same limit, workspace isolation, permission boundaries, and budgets. Unknown means unknown; never infer unlimited capacity.
 
 When no live delegation mechanism exists, continue as one agent: create the task graph, identify independent workstreams, and provide complete task briefs. Never simulate workers, claim that agents were started, or make an external backend a prerequisite.

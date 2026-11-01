@@ -19,6 +19,80 @@ Before dispatch, an adapter should report:
 
 Unknown values remain unknown. An absent limit is not unlimited.
 
+## Normalized capability snapshot
+
+An adapter or host integration should expose a session-local snapshot in a form the coordinator can inspect. This is a conceptual record, not a required JSON schema or a command the Skill can invoke.
+
+Use three evidence states:
+
+- `supported`: the operation is visible, callable in this session, and permitted for the intended task.
+- `unsupported`: the operation is known not to exist or is unavailable under the current permissions.
+- `unknown`: it has not been verified, or the evidence is ambiguous.
+
+Every `supported` entry should cite the exact tool/surface, relevant input/output behavior, and any permission or scope constraint. An error caused by missing permission is not proof that the operation is globally unsupported; record the current-session limitation. Treat `unknown` as unavailable when deciding whether to dispatch.
+
+Suggested capability groups:
+
+~~~yaml
+capabilities:
+  worker:
+    create: unknown
+    observe: unknown
+    collect_result: unknown
+    cancel: unknown
+    message: unknown
+  team:
+    create: unknown
+    message: unknown
+    shared_state: unknown
+  workspace:
+    isolate: unknown
+    release: unknown
+  capacity:
+    global_limit: unknown
+    nested_accounting: unknown
+    provider_limits: unknown
+    current_usage: unknown
+  usage:
+    token_cost_rate_limit: unknown
+evidence:
+  - capability: "worker.create"
+    status: "supported"
+    surface: "exact host tool name"
+    constraints: "confirmed scope, permission, or limit"
+~~~
+
+The snapshot is advisory session state. Do not persist secrets, credentials, full prompts, or private source content in it.
+
+### Dispatch and degradation rules
+
+A worker lifecycle is dispatch-ready only when creation, status/wait observation, and result collection are all supported and creation returns a stable host-issued session ID. Otherwise, do not start workers and use the single-agent fallback. Do not treat an accepted dispatch request as an active session.
+
+- If cancellation is unavailable, restrict delegation to bounded, read-only tasks that do not require mid-flight cancellation.
+- If global or nested capacity accounting is unknown, do not use nested supervisors or scale beyond one worker at a time.
+- For concurrent writes, require isolated workspaces or explicit disjoint path ownership with serialized integration.
+- Missing usage telemetry does not prove zero usage or unlimited budget. Report it as unavailable.
+- Team creation, teammate messaging, and shared task state are separate capabilities; none is implied by subagent creation.
+
+### Lifecycle and error semantics
+
+Keep task state and worker-session state separate. A task may be planned, ready, active, blocked, completed, failed, or cancelled; a worker session has its own host-reported lifecycle. Mark a worker active only after its session ID and active state are confirmed. A queued request is not a running session.
+
+Normalize outcomes without hiding the provider's original evidence:
+
+| Outcome | Coordinator response |
+|---|---|
+| Unsupported operation or permission denied | Do not retry; use an allowed fallback or stop |
+| Capacity exhausted | Apply backpressure; do not bypass the limit |
+| Rate limited | Respect a host-supplied retry delay; retry only idempotent work |
+| Transport interruption | Reconcile session state before retrying to avoid duplicate workers |
+| Queue timeout | Report that the worker was not confirmed started |
+| Worker timeout or failure | Collect available evidence, mark the task accurately, and assess dependants |
+| Cancellation requested | Keep the session active until cancellation is confirmed |
+| Result missing or mismatched task ID | Do not mark the task complete |
+
+Retry only transient, idempotent operations with bounded attempts. Never invent an idempotency field or retry delay when the concrete integration does not expose one.
+
 ## Logical operations
 
 Names below are descriptive placeholders. Call the actual tool names and schemas discovered in the host.

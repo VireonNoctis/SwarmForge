@@ -70,6 +70,37 @@ class SkillPackageTests(unittest.TestCase):
         self.assertIn("failed", patterns)
         self.assertIn("cancelled", patterns)
 
+    def test_worker_dispatch_requires_an_observable_lifecycle(self) -> None:
+        text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        for capability in (
+            "`worker.create`",
+            "`worker.observe`",
+            "`worker.collect_result`",
+            "dispatch-ready",
+            "single-agent fallback",
+        ):
+            with self.subTest(capability=capability):
+                self.assertIn(capability, text)
+        self.assertIn("Treat `unknown` as unavailable", text)
+        self.assertIn("one worker at a time", text)
+
+    def test_adapter_contract_defines_evidence_and_degradation(self) -> None:
+        text = (ROOT / "docs" / "ADAPTER_CONTRACT.md").read_text(encoding="utf-8")
+        for term in (
+            "Normalized capability snapshot",
+            "supported",
+            "unsupported",
+            "unknown",
+            "worker.create",
+            "worker.observe",
+            "worker.collect_result",
+            "Capacity exhausted",
+            "Cancellation requested",
+            "Result missing or mismatched task ID",
+        ):
+            with self.subTest(term=term):
+                self.assertIn(term, text)
+
     def test_skill_metadata_names_the_skill(self) -> None:
         text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("name: swarmforge", text)
