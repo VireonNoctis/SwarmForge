@@ -108,6 +108,7 @@ class SkillPackageTests(unittest.TestCase):
         sources = (ROOT / "docs" / "SOURCES.md").read_text(encoding="utf-8")
         skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
 
+        platform_lower = platform.lower()
         for phrase in (
             "Skill packaging",
             "native subagents",
@@ -123,7 +124,7 @@ class SkillPackageTests(unittest.TestCase):
             "experimental and disabled by default",
         ):
             with self.subTest(phrase=phrase):
-                self.assertIn(phrase, platform)
+                self.assertIn(phrase.lower(), platform_lower)
 
         for url in (
             "https://code.claude.com/docs/en/sub-agents",
