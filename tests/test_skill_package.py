@@ -101,6 +101,44 @@ class SkillPackageTests(unittest.TestCase):
             with self.subTest(term=term):
                 self.assertIn(term, text)
 
+    def test_platform_compatibility_separates_host_and_api_capabilities(self) -> None:
+        platform = (ROOT / "docs" / "PLATFORM_COMPATIBILITY.md").read_text(
+            encoding="utf-8"
+        )
+        sources = (ROOT / "docs" / "SOURCES.md").read_text(encoding="utf-8")
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+
+        for phrase in (
+            "Skill packaging",
+            "native subagents",
+            "agent teams",
+            "ordinary tool call",
+            "provider API orchestration",
+            "Gemini CLI",
+            "ChatGPT Work",
+            "Codex CLI",
+            "Grok",
+            "OpenAI Agents API",
+            "Responses API",
+            "experimental and disabled by default",
+        ):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, platform)
+
+        for url in (
+            "https://code.claude.com/docs/en/sub-agents",
+            "https://code.claude.com/docs/en/agent-teams",
+            "https://learn.chatgpt.com/docs/agent-configuration/subagents",
+            "https://github.com/google-gemini/gemini-cli/blob/main/docs/core/subagents.md",
+            "https://docs.x.ai/developers/model-capabilities/text/multi-agent",
+            "https://developers.openai.com/api/docs/guides/responses-multi-agent",
+        ):
+            with self.subTest(url=url):
+                self.assertIn(url, sources)
+
+        self.assertIn("ordinary tool calls", skill)
+        self.assertIn("required worker lifecycle", skill)
+
     def test_skill_metadata_names_the_skill(self) -> None:
         text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("name: swarmforge", text)

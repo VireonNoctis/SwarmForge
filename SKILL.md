@@ -34,7 +34,9 @@ If the requested count is zero, or no live worker lifecycle is available, use th
 
 ## 1. Discover real delegation capabilities
 
-After the worker-limit gate, inspect the tools and features actually available in this session. Classify each requested ecosystem — Claude Code, Claude Design, Grok, ChatGPT, OpenAI Codex, and Google Gemini — as **connected and usable**, **partially available**, or **unavailable**, with the concrete tool/surface evidence. A product name or documentation link alone is not an integration. Re-check these statuses each session; do not assume providers can communicate with one another.
+After the worker-limit gate, inspect the tools and features actually available in this session. Classify each requested ecosystem — Claude Code, Claude Design, Grok, ChatGPT, OpenAI Codex, and Google Gemini — as **connected and usable**, **partially available**, or **unavailable**, with the concrete tool/surface evidence. A product name or documentation link alone is not an integration. Re-check these statuses each session; do not assume providers can communicate with one another. Use `docs/PLATFORM_COMPATIBILITY.md` to interpret documented host features, but never treat that matrix as proof that a feature is exposed in the current session.
+
+Keep five things distinct: Skill packaging/discovery, native subagents, peer agent teams, ordinary tool calls, and provider API orchestration. A shell, MCP, function, browser, plugin, or CI call is not a model worker merely because it performs work. A provider API's multi-agent feature or internally coordinated research model is not a connected product surface unless an already configured, authorized adapter exposes the required worker lifecycle in this session.
 
 Classify the environment as one of:
 

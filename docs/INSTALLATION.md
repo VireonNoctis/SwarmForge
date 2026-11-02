@@ -50,9 +50,19 @@ Place the full Skill directory at the host's documented location. Refresh/restar
 
 ## ChatGPT and OpenAI surfaces
 
-Use the standalone Skill installation flow provided by the supported ChatGPT/Codex surface. Where the product distributes Skills through a plugin or another packaging mechanism, follow the current official instructions for that surface.
+Standalone Skills are documented for the ChatGPT desktop app, Codex CLI, and Codex IDE extension. Use the Skills interface or local Skill discovery flow supported by the specific surface. For ChatGPT web and mobile, and for ChatGPT Work distribution, use the supported plugin flow when the Skill is bundled in a plugin; do not assume that a local `.agents/skills` folder is available to a hosted chat.
 
-The repository includes optional `agents/openai.yaml` presentation metadata. It does not bundle an MCP server or declare a server dependency.
+Codex repository and user Skills use `.agents/skills/`. The repository includes optional `agents/openai.yaml` presentation metadata for supported OpenAI Skill surfaces. It does not bundle an MCP server or declare a server dependency.
+
+## Gemini CLI
+
+Install the public repository as a Skill using the CLI's supported installer:
+
+~~~bash
+gemini skills install https://github.com/VireonNoctis/SwarmForge.git
+~~~
+
+The default scope is user-level. Add `--scope workspace` to install it for the current project instead. Keep the interactive consent prompt enabled, then verify discovery with `/skills list`. Gemini CLI documents user and workspace Skill locations under `.gemini/skills/` and the interoperable `.agents/skills/` alias.
 
 ## VS Code and Copilot
 
