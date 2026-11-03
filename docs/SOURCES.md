@@ -34,12 +34,12 @@ Provider behavior, product surfaces, packaging requirements, and limits can chan
 
 ## Native host delegation and Skill discovery
 
-- [Claude Code: Create custom subagents](https://code.claude.com/docs/en/sub-agents) — subagent contexts, tool access, foreground/background work, and result handling.
+- [Claude Code: Create custom subagents](https://code.claude.com/docs/en/sub-agents) — Agent/legacy Task naming, foreground/background behavior, result handling, tool restrictions, and context-dependent controls (reviewed 2026-11-03).
 - [Claude Code: Agent teams](https://code.claude.com/docs/en/agent-teams) — peer messaging and shared tasks; experimental and disabled by default.
-- [OpenAI: Subagents in ChatGPT and Codex](https://learn.chatgpt.com/docs/agent-configuration/subagents) — ChatGPT Work eligibility, Codex app/CLI/IDE workflows, inspection, and configuration.
+- [OpenAI: Subagents in ChatGPT and Codex](https://learn.chatgpt.com/docs/agent-configuration/subagents) — ChatGPT Work eligibility, Codex app/CLI/IDE workflows, waiting/result consolidation, stop controls, and inherited sandbox settings (reviewed 2026-11-03).
 - [Gemini CLI: Agent Skills](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/skills.md) — user/workspace discovery, `.agents/skills` alias, installation, and activation.
-- [Gemini CLI: Subagents](https://github.com/google-gemini/gemini-cli/blob/main/docs/core/subagents.md) — native subagent behavior and custom agents.
-- [Gemini CLI: Remote subagents](https://github.com/google-gemini/gemini-cli/blob/main/docs/core/remote-agents.md) — optional A2A connections to remote agents.
+- [Gemini CLI: Subagents](https://github.com/google-gemini/gemini-cli/blob/main/docs/core/subagents.md) — named subagent tools, custom agent definitions, tool access, and result reporting; does not define a universal cross-host lifecycle schema (reviewed 2026-11-03).
+- [Gemini CLI: Remote subagents](https://github.com/google-gemini/gemini-cli/blob/main/docs/core/remote-agents.md) — optional A2A connections to remote agents; treat each remote connection as a separately configured integration, not automatic local team support.
 - [VS Code: Custom agents](https://code.visualstudio.com/docs/agent-customization/custom-agents) — harness-specific custom-agent and subagent behavior.
 
 ## Provider API orchestration (separate from product integrations)

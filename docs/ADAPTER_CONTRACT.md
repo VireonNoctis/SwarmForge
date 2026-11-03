@@ -107,6 +107,29 @@ Normalize outcomes without hiding the provider's original evidence:
 
 Retry only transient, idempotent operations with bounded attempts. Never invent an idempotency field or retry delay when the concrete integration does not expose one.
 
+## Native-host lifecycle mapping (reference only)
+
+The following mappings translate documented host behavior into questions for the normalized capability snapshot. They are not universal tool schemas, and documentation alone does not make a capability supported. Names, controls, return shapes, permissions, and behavior vary by client and version.
+
+| Host surface | Create candidate | Observe / wait candidate | Result collection candidate | Stop / cancel evidence | Coordination and workspace caveats |
+|---|---|---|---|---|---|
+| Claude Code | The Agent tool creates subagents when that tool is exposed. Current documentation says Task was renamed to Agent in version 2.1.63; legacy Task references may remain valid aliases. | A foreground call blocks until completion. Background work can report through completion notifications and the /tasks interface; wait behavior differs by session mode and fork configuration. Confirm the current session exposes an observable status or wait path. | The parent receives the subagent result; preserve partial output and explicit failure information rather than treating any returned text as success. | Use only a stop operation or control exposed to the parent in this session. TaskStop appears in context-specific tool availability; do not assume it is a universal parent cancellation API. Verify terminal state after requesting a stop. | SendMessage, cross-session visibility, and task tools depend on configuration and context. Agent Teams are distinct from subagents and require their own feature availability. A separate context does not prove a separate filesystem or isolated write workspace. |
+| Codex CLI / IDE / app and ChatGPT Work | The host can orchestrate subagent workflows, but the documented workflow does not define one portable tool name shared by every client. ChatGPT Work availability is account-dependent. | Codex documents the /subagents command and client activity panels. Treat a UI-only indicator as human visibility, not as a machine-readable status API unless the current session exposes it to the coordinator. | The host can consolidate results into the parent response; supported clients also allow inspection of individual agent threads. Correlate each result to its originating task using evidence available in the current session. | Use the client’s exposed stop/close control or instruction path only when available, then verify that the worker actually reached a terminal state. Do not infer cancellation from a request being accepted. | Parent sandbox and approval settings are inherited. A custom agent definition does not itself create a read-only sandbox. Parent-driven steering does not imply peer messaging, shared task state, or isolated worktrees. |
+| Gemini CLI | The main agent can invoke configured or built-in subagent tools by their agent names. The @name prompt syntax nudges routing; it is not a portable lifecycle API. | A subagent reports when its delegated task completes, but the cited documentation does not define a universal machine-readable status/wait interface for every CLI session. Inspect the tools actually exposed. | Collect the report returned to the main agent and verify task identity and completeness. Do not assume a stable session ID unless the live host returns one. | Do not assume a generic cancellation operation from subagent support alone. Mark cancellation supported only when the current surface exposes an operation and its outcome can be observed. | Local subagents do not automatically provide peer-team semantics, shared task state, or filesystem isolation. Remote A2A agents are a separately configured integration and must be assessed independently. |
+
+### Evidence required before normalizing a host
+
+For each candidate operation, record the client and version when available, exact exposed tool or control, relevant schema or observable input/output, permission scope, and evidence of the outcome. Then apply these checks:
+
+1. Mark worker.create supported only when the current surface actually starts a distinct model session and returns a stable host-issued session identifier.
+2. Mark worker.observe supported only when the coordinator can inspect status or wait for an outcome in the current session. A documentation page, activity panel, or human-visible command is not automatically a callable adapter operation.
+3. Mark worker.collect_result supported only when the result can be retrieved and correlated to the originating task/session; preserve failure and partial-result signals.
+4. Mark worker.cancel supported only when the current surface exposes cancellation and the resulting state can be verified. A request to stop is not proof that work stopped.
+5. Mark workspace.isolate supported only when the current environment proves the worker's write workspace is isolated, or the coordinator has established non-overlapping paths and serialized integration.
+6. Assess team creation, peer messaging, shared state, global/nested accounting, and usage telemetry separately. Never infer them from subagent creation.
+
+If the required creation, observation, or result-collection evidence is missing, keep that capability unknown and follow the single-agent fallback in SKILL.md. Do not manufacture a cross-provider adapter from similar-looking product features.
+
 ## Logical operations
 
 Names below are descriptive placeholders. Call the actual tool names and schemas discovered in the host.

@@ -101,6 +101,40 @@ class SkillPackageTests(unittest.TestCase):
             with self.subTest(term=term):
                 self.assertIn(term, text)
 
+    def test_adapter_contract_maps_native_host_lifecycle_without_assuming_parity(self) -> None:
+        contract = (ROOT / "docs" / "ADAPTER_CONTRACT.md").read_text(
+            encoding="utf-8"
+        )
+        sources = (ROOT / "docs" / "SOURCES.md").read_text(encoding="utf-8")
+
+        contract_lower = contract.lower()
+        self.assertIn("native-host lifecycle mapping", contract_lower)
+        for phrase in (
+            "claude code",
+            "codex cli",
+            "gemini cli",
+            "worker.create",
+            "worker.observe",
+            "worker.collect_result",
+            "worker.cancel",
+            "workspace.isolate",
+            "stable host-issued session identifier",
+            "single-agent fallback",
+            "not a portable lifecycle api",
+            "do not automatically provide peer-team semantics",
+        ):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase.lower(), contract_lower)
+
+        for url in (
+            "https://code.claude.com/docs/en/sub-agents",
+            "https://learn.chatgpt.com/docs/agent-configuration/subagents",
+            "https://github.com/google-gemini/gemini-cli/blob/main/docs/core/subagents.md",
+            "https://github.com/google-gemini/gemini-cli/blob/main/docs/core/remote-agents.md",
+        ):
+            with self.subTest(url=url):
+                self.assertIn(url, sources)
+
     def test_platform_compatibility_separates_host_and_api_capabilities(self) -> None:
         platform = (ROOT / "docs" / "PLATFORM_COMPATIBILITY.md").read_text(
             encoding="utf-8"
