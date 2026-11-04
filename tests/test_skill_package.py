@@ -101,6 +101,43 @@ class SkillPackageTests(unittest.TestCase):
             with self.subTest(term=term):
                 self.assertIn(term, text)
 
+    def test_capability_evidence_is_scoped_and_provenance_aware(self) -> None:
+        contract = (ROOT / "docs" / "ADAPTER_CONTRACT.md").read_text(
+            encoding="utf-8"
+        )
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+
+        for phrase in (
+            "Evidence record and freshness",
+            "session_context:",
+            "client_version:",
+            "observed_at:",
+            "inventory_complete:",
+            "evidence_kind:",
+            "live_observation",
+            "tool_inventory",
+            "configuration",
+            "official_documentation",
+            "permission_scope:",
+            "worker_session_id:",
+            "terminal_state:",
+            "evidence_ref:",
+            "current-session inventory is complete",
+            "never create a worker",
+            "downgrade the capability to",
+        ):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase.lower(), contract.lower())
+
+        for phrase in (
+            "using the evidence record in `docs/ADAPTER_CONTRACT.md`",
+            "Capability status is current-session evidence",
+            "Do not invoke operations solely to probe",
+            "If inventory or evidence is incomplete, use `unknown`",
+        ):
+            with self.subTest(skill_phrase=phrase):
+                self.assertIn(phrase, skill)
+
     def test_adapter_contract_maps_native_host_lifecycle_without_assuming_parity(self) -> None:
         contract = (ROOT / "docs" / "ADAPTER_CONTRACT.md").read_text(
             encoding="utf-8"

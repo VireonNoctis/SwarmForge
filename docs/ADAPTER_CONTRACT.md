@@ -76,7 +76,51 @@ The normalized capability IDs are not tool names. Map them to the concrete opera
 
 These names are illustrative mappings only. Confirm that the actual operation's schema and returned data satisfy the capability before marking it supported.
 
-The snapshot is advisory session state. Do not persist secrets, credentials, full prompts, or private source content in it.
+The snapshot and its evidence are advisory, session-local state. Do not persist secrets, credentials, full prompts, or private source content in them.
+
+### Evidence record and freshness
+
+Use this compact record for each capability assessment. It is a documentation template, not a required API schema:
+
+~~~yaml
+session_context:
+  host: "..."
+  client_surface: "..."
+  client_version: null
+  observed_at: "<ISO-8601 timestamp>"
+  inventory_complete: false
+evidence:
+  - capability: "worker.create"
+    status: "unknown"
+    evidence_kind: "tool_inventory"
+    operation: "exact exposed tool/control name, or null"
+    schema_ref: "tool-schema identifier or source path"
+    permission_scope: "current task and workspace permissions"
+    task_id: null
+    worker_session_id: null
+    observed_outcome: "visible in inventory; not invoked solely for testing"
+    terminal_state: null
+    result_ref: null
+    evidence_ref: "redacted source or observation reference"
+    constraints: "..."
+~~~
+
+Evidence kinds have deliberately different weight:
+
+| Evidence kind | What it establishes | What it does not establish |
+|---|---|---|
+| `live_observation` | An operation's observed behavior during authorized, ordinary task execution | Behavior outside the observed scope or session |
+| `tool_inventory` | An exact operation and schema are exposed in the current session | Successful execution unless the schema and permission contract are sufficient and the outcome is observed |
+| `configuration` | A feature, setting, or permission appears configured | That the current host exposes or can successfully use it |
+| `official_documentation` | A provider documents a product or API capability | That this session has the product, account entitlement, credentials, permissions, or integration |
+
+For a dispatch-critical capability, a complete current-session tool inventory may establish the declared contract only when the exact callable schema and permission scope satisfy the normalized requirement. In particular, `worker.create` must expose a stable host-issued session identifier; `worker.observe` must expose status or wait information; and `worker.collect_result` must expose a result that can be correlated to the originating task/session. A tool name, product feature, activity panel, or documentation example is not enough. Prefer a live observation from legitimate task work when available, but never create a worker, cancel work, send messages, allocate a workspace, or spend provider budget solely to test a capability.
+
+Record `worker_session_id`, terminal state, and result reference only when the host actually supplies them. For workspace isolation, record the observed workspace boundary or the coordinator-enforced non-overlapping path ownership. For capacity, record the reporting surface, scope, timestamp, whether the root and descendants are included, and whether the value is configured or currently available.
+
+Use `unsupported` only when the relevant current-session inventory is complete and the operation is absent from that surface, or when the current task is explicitly denied permission. A permission denial is a session/task limitation, not proof that the provider lacks the feature globally. Use `unknown` when inventory is incomplete, a schema omits a required contract detail, or evidence consists only of configuration or official documentation.
+
+Keep evidence minimal and redacted: IDs, status, timestamps, schema/source references, permission scope, and concise outcomes are sufficient. Do not copy prompts, private source text, credentials, or full logs into the record. Reassess at each new task session and after host/client version, configuration, permission, or workspace changes. There is no universal evidence TTL; if freshness cannot be established, downgrade the capability to `unknown`.
 
 ### Dispatch and degradation rules
 
