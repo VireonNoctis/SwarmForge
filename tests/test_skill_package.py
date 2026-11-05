@@ -233,6 +233,10 @@ class SkillPackageTests(unittest.TestCase):
             "partially_available",
             "unavailable",
             '"<connected_usable|partially_available|unavailable>"',
+            '"<exact inspected surface or inventory>"',
+            '"<redacted evidence reference>"',
+            "worker.observe: unknown",
+            "worker.collect_result: unknown",
             "incomplete inventory makes unverified operations unknown",
             "Do not include credentials",
         ):

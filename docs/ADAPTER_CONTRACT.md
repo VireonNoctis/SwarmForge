@@ -195,16 +195,18 @@ capability_report:
       status: unknown
       evidence_ref: null
   ecosystems:
-    claude_code: {status: "<connected_usable|partially_available|unavailable>", surface: null, evidence_ref: null}
-    claude_design: {status: "<connected_usable|partially_available|unavailable>", surface: null, evidence_ref: null}
-    grok: {status: "<connected_usable|partially_available|unavailable>", surface: null, evidence_ref: null}
-    chatgpt: {status: "<connected_usable|partially_available|unavailable>", surface: null, evidence_ref: null}
-    openai_codex: {status: "<connected_usable|partially_available|unavailable>", surface: null, evidence_ref: null}
-    google_gemini: {status: "<connected_usable|partially_available|unavailable>", surface: null, evidence_ref: null}
+    claude_code: {status: "<connected_usable|partially_available|unavailable>", surface: "<exact inspected surface or inventory>", evidence_ref: "<redacted evidence reference>"}
+    claude_design: {status: "<connected_usable|partially_available|unavailable>", surface: "<exact inspected surface or inventory>", evidence_ref: "<redacted evidence reference>"}
+    grok: {status: "<connected_usable|partially_available|unavailable>", surface: "<exact inspected surface or inventory>", evidence_ref: "<redacted evidence reference>"}
+    chatgpt: {status: "<connected_usable|partially_available|unavailable>", surface: "<exact inspected surface or inventory>", evidence_ref: "<redacted evidence reference>"}
+    openai_codex: {status: "<connected_usable|partially_available|unavailable>", surface: "<exact inspected surface or inventory>", evidence_ref: "<redacted evidence reference>"}
+    google_gemini: {status: "<connected_usable|partially_available|unavailable>", surface: "<exact inspected surface or inventory>", evidence_ref: "<redacted evidence reference>"}
   dispatch:
     decision: single_agent_fallback
     blocking_reasons:
       - "worker.create: unknown — exact create contract and stable session ID not established"
+      - "worker.observe: unknown — status or wait contract not established"
+      - "worker.collect_result: unknown — task-correlated result contract not established"
   limits:
     global_active_sessions: {value: unknown, evidence_ref: null}
     nested_accounting: {value: unknown, evidence_ref: null}
