@@ -211,6 +211,43 @@ class SkillPackageTests(unittest.TestCase):
         self.assertIn("ordinary tool calls", skill)
         self.assertIn("required worker lifecycle", skill)
 
+    def test_final_report_requires_evidence_linked_capability_summary(self) -> None:
+        contract = (ROOT / "docs" / "ADAPTER_CONTRACT.md").read_text(
+            encoding="utf-8"
+        )
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+
+        for phrase in (
+            "Compact capability report",
+            "capability_report:",
+            "inventory_complete:",
+            "worker.create:",
+            "worker.observe:",
+            "worker.collect_result:",
+            "evidence_ref:",
+            "dispatch:",
+            "blocking_reasons:",
+            "dispatch_ready",
+            "single_agent_fallback",
+            "connected_usable",
+            "partially_available",
+            "unavailable",
+            "incomplete inventory makes unverified operations unknown",
+            "Do not include credentials",
+        ):
+            with self.subTest(contract_phrase=phrase):
+                self.assertIn(phrase.lower(), contract.lower())
+
+        for phrase in (
+            "a compact session capability summary",
+            "exact evidence reference",
+            "every blocking capability",
+            "Keep capability status",
+            "Never infer operation support from a provider label",
+        ):
+            with self.subTest(skill_phrase=phrase):
+                self.assertIn(phrase.lower(), skill.lower())
+
     def test_skill_metadata_names_the_skill(self) -> None:
         text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("name: swarmforge", text)

@@ -191,10 +191,15 @@ For the capacity model and evidence required for a 500-session claim, read `docs
 
 At completion, report:
 - chosen execution mode and why;
+- a compact session capability summary using `docs/ADAPTER_CONTRACT.md`: host/surface/version, observation time, inventory completeness, each dispatch-critical capability's status and exact evidence reference, relevant optional capabilities, and known versus unknown limits;
+- a separate ecosystem table for Claude Code, Claude Design, Grok, ChatGPT, OpenAI Codex, and Google Gemini, with the actual accessible surface and evidence;
+- an explicit `dispatch_ready` or `single_agent_fallback` decision; when falling back, name every blocking capability, its status, and the exact missing evidence or permission;
 - confirmed workers launched, completed, failed, cancelled, and queued;
 - files or areas changed;
 - checks run and exact outcomes;
 - important decisions, risks, and remaining work;
 - whether the requested capacity target was reached, and why not.
+
+Keep capability status (`supported`, `unsupported`, or `unknown`) distinct from ecosystem availability (`connected_usable`, `partially_available`, or `unavailable`). Never infer operation support from a provider label. Cite redacted evidence references for claims; if evidence is incomplete, say so and use `unknown`.
 
 Never equate planned task count, queued jobs, logical roles, or retry attempts with active AI agents. Never claim a 500-agent run unless 500 distinct sessions were actually confirmed active.

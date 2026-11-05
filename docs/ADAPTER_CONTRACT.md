@@ -132,6 +132,93 @@ A worker lifecycle is dispatch-ready only when creation, status/wait observation
 - Missing usage telemetry does not prove zero usage or unlimited budget. Report it as unavailable.
 - Team creation, teammate messaging, and shared task state are separate capabilities; none is implied by subagent creation.
 
+### Compact capability report
+
+At the end of each task session, emit one concise capability summary from the session-local evidence. This is a decision record, not a copy of every tool schema.
+
+Use the following template and omit optional rows that were not relevant to the task. Keep every dispatch-critical row.
+
+~~~yaml
+capability_report:
+  session_ref: "session-scoped reference"
+  host_surface: "exact current host/client surface"
+  client_version: null
+  observed_at: "<ISO-8601 timestamp>"
+  inventory_complete: false
+  capabilities:
+    worker.create:
+      status: unknown
+      evidence_ref: null
+      constraint: "stable host-issued session ID not established"
+    worker.observe:
+      status: unknown
+      evidence_ref: null
+      constraint: "status or wait contract not established"
+    worker.collect_result:
+      status: unknown
+      evidence_ref: null
+      constraint: "task-correlated result contract not established"
+    worker.cancel:
+      status: unknown
+      evidence_ref: null
+    worker.message:
+      status: unknown
+      evidence_ref: null
+    team.create:
+      status: unknown
+      evidence_ref: null
+    team.message:
+      status: unknown
+      evidence_ref: null
+    team.shared_state:
+      status: unknown
+      evidence_ref: null
+    workspace.isolate:
+      status: unknown
+      evidence_ref: null
+    workspace.release:
+      status: unknown
+      evidence_ref: null
+    capacity.global_limit:
+      status: unknown
+      evidence_ref: null
+    capacity.nested_accounting:
+      status: unknown
+      evidence_ref: null
+    capacity.provider_limits:
+      status: unknown
+      evidence_ref: null
+    capacity.current_usage:
+      status: unknown
+      evidence_ref: null
+    usage.token_cost_rate_limit:
+      status: unknown
+      evidence_ref: null
+  ecosystems:
+    claude_code: {status: unavailable, surface: null, evidence_ref: null}
+    claude_design: {status: unavailable, surface: null, evidence_ref: null}
+    grok: {status: unavailable, surface: null, evidence_ref: null}
+    chatgpt: {status: unavailable, surface: null, evidence_ref: null}
+    openai_codex: {status: unavailable, surface: null, evidence_ref: null}
+    google_gemini: {status: unavailable, surface: null, evidence_ref: null}
+  dispatch:
+    decision: single_agent_fallback
+    blocking_reasons:
+      - "worker.create: unknown — exact create contract and stable session ID not established"
+  limits:
+    global_active_sessions: {value: unknown, evidence_ref: null}
+    nested_accounting: {value: unknown, evidence_ref: null}
+    provider_limits: {value: unknown, evidence_ref: null}
+    workspace_capacity: {value: unknown, evidence_ref: null}
+    usage_telemetry: {value: unknown, evidence_ref: null}
+~~~
+
+Use only these capability statuses: `supported`, `unsupported`, and `unknown`. Ecosystem availability is a separate classification: `connected_usable`, `partially_available`, or `unavailable`. Include the exact exposed surface and a redacted evidence reference for every non-unknown claim; a status without provenance is not an auditable finding.
+
+Set `dispatch.decision` to `dispatch_ready` only when `worker.create`, `worker.observe`, and `worker.collect_result` are all supported by current-session evidence and creation returns a stable host-issued session ID. Otherwise set it to `single_agent_fallback` and list every blocking capability, its status, and the missing evidence or permission. An incomplete inventory makes unverified operations unknown, not unsupported.
+
+Keep ecosystem labels separate from operation status: a partially available provider can still lack the required worker lifecycle, and documented provider features do not make an ecosystem connected. Report only limits actually exposed by the host; leave the rest unknown. Do not include credentials, prompts, private source content, or full logs.
+
 ### Lifecycle and error semantics
 
 Keep task state and worker-session state separate. A task may be planned, ready, active, blocked, completed, failed, or cancelled; a worker session has its own host-reported lifecycle. Mark a worker active only after its session ID and active state are confirmed. A queued request is not a running session.
