@@ -232,6 +232,7 @@ class SkillPackageTests(unittest.TestCase):
             "connected_usable",
             "partially_available",
             "unavailable",
+            '"<connected_usable|partially_available|unavailable>"',
             "incomplete inventory makes unverified operations unknown",
             "Do not include credentials",
         ):

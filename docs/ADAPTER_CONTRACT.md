@@ -195,12 +195,12 @@ capability_report:
       status: unknown
       evidence_ref: null
   ecosystems:
-    claude_code: {status: unavailable, surface: null, evidence_ref: null}
-    claude_design: {status: unavailable, surface: null, evidence_ref: null}
-    grok: {status: unavailable, surface: null, evidence_ref: null}
-    chatgpt: {status: unavailable, surface: null, evidence_ref: null}
-    openai_codex: {status: unavailable, surface: null, evidence_ref: null}
-    google_gemini: {status: unavailable, surface: null, evidence_ref: null}
+    claude_code: {status: "<connected_usable|partially_available|unavailable>", surface: null, evidence_ref: null}
+    claude_design: {status: "<connected_usable|partially_available|unavailable>", surface: null, evidence_ref: null}
+    grok: {status: "<connected_usable|partially_available|unavailable>", surface: null, evidence_ref: null}
+    chatgpt: {status: "<connected_usable|partially_available|unavailable>", surface: null, evidence_ref: null}
+    openai_codex: {status: "<connected_usable|partially_available|unavailable>", surface: null, evidence_ref: null}
+    google_gemini: {status: "<connected_usable|partially_available|unavailable>", surface: null, evidence_ref: null}
   dispatch:
     decision: single_agent_fallback
     blocking_reasons:
