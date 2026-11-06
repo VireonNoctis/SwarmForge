@@ -69,6 +69,63 @@ class SkillPackageTests(unittest.TestCase):
         self.assertIn("completed", patterns)
         self.assertIn("failed", patterns)
         self.assertIn("cancelled", patterns)
+        self.assertIn("Dependency failure, partial results, and recovery", patterns)
+        self.assertIn("attempts: []", patterns)
+        self.assertIn("blocked_by: []", patterns)
+
+    def test_partial_results_block_dependants_without_erasing_history(self) -> None:
+        patterns = (ROOT / "docs" / "ORCHESTRATION_PATTERNS.md").read_text(
+            encoding="utf-8"
+        )
+        adapter = (ROOT / "docs" / "ADAPTER_CONTRACT.md").read_text(
+            encoding="utf-8"
+        )
+        workflows = (ROOT / "docs" / "WORKFLOWS.md").read_text(encoding="utf-8")
+
+        for phrase in (
+            "partial or unavailable results never satisfy a dependency",
+            "block every not-yet-started transitive dependant",
+            "do not automatically cancel active dependants",
+            "preserve completed task history",
+            "blocked_by",
+            "result_completeness",
+        ):
+            with self.subTest(pattern=phrase):
+                self.assertIn(phrase.lower(), patterns.lower())
+
+        for phrase in (
+            "Partial or truncated result",
+            "Failed or cancelled dependency",
+            "quarantine the uncorrelated result",
+            "previous_attempt_id",
+            "provisional",
+        ):
+            with self.subTest(adapter_phrase=phrase):
+                self.assertIn(phrase.lower(), adapter.lower())
+
+        self.assertIn("partial artifacts", workflows.lower())
+        self.assertIn("transitive dependant", workflows.lower())
+
+    def test_coordinator_recovery_reconciles_before_redispatch(self) -> None:
+        patterns = (ROOT / "docs" / "ORCHESTRATION_PATTERNS.md").read_text(
+            encoding="utf-8"
+        )
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+
+        for phrase in (
+            "checkpoint_schema_version: 1",
+            "checkpointed_at:",
+            "attempt_id",
+            "previous_attempt_id",
+            "reconcile every nonterminal worker with the host",
+            "do not redispatch an unobservable worker",
+            "no durable checkpoint exists",
+        ):
+            with self.subTest(checkpoint_phrase=phrase):
+                self.assertIn(checkpoint_phrase.lower(), patterns.lower())
+
+        self.assertIn("restore the latest available checkpoint", skill.lower())
+        self.assertIn("before redispatch", skill.lower())
 
     def test_worker_dispatch_requires_an_observable_lifecycle(self) -> None:
         text = (ROOT / "SKILL.md").read_text(encoding="utf-8")

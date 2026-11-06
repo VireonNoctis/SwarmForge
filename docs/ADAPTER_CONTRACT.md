@@ -236,7 +236,33 @@ Normalize outcomes without hiding the provider's original evidence:
 | Queue timeout | Report that the worker was not confirmed started |
 | Worker timeout or failure | Collect available evidence, mark the task accurately, and assess dependants |
 | Cancellation requested | Keep the session active until cancellation is confirmed |
-| Result missing or mismatched task ID | Do not mark the task complete |
+| Result missing or mismatched task ID | Do not mark the task complete; quarantine the uncorrelated result |
+| Partial or truncated result | Preserve available artifacts and checks; do not complete the task or unlock dependants |
+| Failed or cancelled dependency | Block every not-yet-started transitive dependant and record the root cause |
+| Active dependant after dependency invalidation | Keep its worker state separate, mark its task blocked/provisional, and do not automatically cancel it |
+| Coordinator interruption or restart | Reconcile checkpointed worker IDs with host state before any redispatch |
+
+### Partial-result and dependency rules
+
+Use this attempt-level record when an adapter returns a result:
+
+~~~yaml
+attempt_id: "sf-20261031-x7k2-02-a01"
+previous_attempt_id: null
+worker_session_id: null
+worker_terminal_state: null
+result_completeness: "complete|partial|unavailable"
+artifact_refs: []
+evidence_refs: []
+acceptance_criteria_verified: false
+unmet_criteria: []
+~~~
+
+result_completeness describes the returned evidence, not task status. A partial or unavailable result never satisfies a dependency. A complete worker result is still only a proposal until the coordinator verifies the deliverable and all acceptance criteria. A worker may fail after producing a usable artifact; preserve the worker failure and assess the artifact independently rather than automatically accepting or discarding it.
+
+When a dependency fails, is cancelled, or remains incomplete, block all not-yet-started transitive dependants. Keep blocked_by references to the root task IDs. Do not automatically cancel active dependants: assess whether their work remains useful, request cancellation only when supported and safe, and wait for confirmation. Any result produced while its dependency is invalid remains provisional until revalidated. Preserve completed task history and create a corrective task if an already-completed dependant no longer meets acceptance criteria.
+
+Every retry or reassignment keeps the stable task ID and adds a new unique attempt_id linked through previous_attempt_id. Reconcile the previous worker's state before redispatch; if it is unobservable, keep the task blocked rather than risking duplicate work. Record the coordinator's explicit recovery decision and rationale.
 
 Retry only transient, idempotent operations with bounded attempts. Never invent an idempotency field or retry delay when the concrete integration does not expose one.
 

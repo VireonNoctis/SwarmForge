@@ -179,13 +179,16 @@ For the capacity model and evidence required for a 500-session claim, read `docs
 
 ## 9. Integrate and verify
 
-1. Collect outputs and mark every task completed, failed, cancelled, or blocked.
-2. Check for scope drift, fabricated details, duplicate work, incompatible assumptions, and missing evidence.
-3. Integrate in dependency order. Resolve patch conflicts deliberately; never accept a patch merely because it arrived first.
-4. Run relevant tests, builds, lint, type, and security checks available in the project.
-5. For substantial work, ask an independent reviewer to inspect the combined diff, not just worker summaries.
-6. Re-run affected checks after resolving conflicts or making final changes.
-7. Identify checks that could not be run. A worker's assertion is not proof unless its command and result are visible or independently reproduced.
+1. Collect outputs and preserve partial artifacts, completed checks, and failure evidence. Keep task status separate from worker-session status and result completeness.
+2. Apply the dependency-failure rules in docs/ORCHESTRATION_PATTERNS.md: block transitive dependants, keep active dependants provisional, and never treat partial results as satisfying dependencies.
+3. Reconcile nonterminal workers with the host before retrying or redispatching. After coordinator restart, restore the latest available checkpoint and do not duplicate an unobservable worker.
+4. Record an explicit recovery decision and preserve attempt lineage before retrying, reassigning, splitting, or resuming work.
+5. Check for scope drift, fabricated details, duplicate work, incompatible assumptions, and missing evidence.
+6. Integrate in dependency order. Resolve patch conflicts deliberately; never accept a patch merely because it arrived first.
+7. Run relevant tests, builds, lint, type, and security checks available in the project.
+8. For substantial work, ask an independent reviewer to inspect the combined diff, not just worker summaries.
+9. Re-run affected checks after resolving conflicts or making final changes.
+10. Identify checks that could not be run. A worker's assertion is not proof unless its command and result are visible or independently reproduced.
 
 ## 10. Report honestly
 

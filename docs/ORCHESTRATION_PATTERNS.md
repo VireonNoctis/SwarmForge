@@ -69,6 +69,9 @@ tasks:
     worker_session_id: null
     worker_status: null
     result_ref: null
+    attempts: []
+    blocked_by: []
+    recovery_decision: null
 ~~~
 
 The cap is optional when the user has not supplied one; never infer host capacity from a requested cap. Keep references narrow and use repository-relative paths. Add fields only when they improve coordination.
@@ -82,6 +85,54 @@ The cap is optional when the user has not supplied one; never infer host capacit
 - Default to read-only tasks. Concurrent write paths must not overlap. Serialize shared-file work or reserve those paths for the coordinator; never rely on a role label as a file lock.
 - Mark a task complete only after its deliverable exists, its acceptance criteria are checked, and the coordinator has inspected the evidence. Record failed checks and unresolved risks in the result.
 
+### Dependency failure, partial results, and recovery
+
+Treat graph readiness as an evidence-derived condition, not a dispatch preference.
+
+**Dependency propagation**
+
+- A task is ready only when every direct dependency is completed and its acceptance evidence has been verified by the coordinator.
+- If a dependency is blocked, failed, cancelled, or has only a partial/unavailable result, block every not-yet-started transitive dependant. Record the root blocking task IDs in blocked_by; do not label descendants failed or cancelled merely because an upstream task failed.
+- If an upstream dependency becomes invalid while a dependant is active, set the dependant task to blocked with a clear reason while keeping its worker-session state separate. Do not automatically cancel active dependants. If stopping is necessary and cancellation is available, request it and wait for observed confirmation; otherwise let bounded work finish but keep its output provisional and out of integration until dependencies are revalidated.
+- Preserve completed task history. If an upstream result is later invalidated, re-check completed dependants against the corrected evidence and create an explicit corrective task for any regression; do not silently erase or rewrite prior outcomes.
+- Unblock work only after the dependency is repaired, its acceptance criteria are re-verified, and the coordinator records the graph revision and reason. Recompute readiness from the full dependency graph rather than clearing one blocked flag manually.
+
+**Partial results and attempts**
+
+- Keep task state, worker-session state, and result completeness as separate fields. result_completeness is complete, partial, or unavailable; it describes the returned artifact, not the task's lifecycle state.
+- Preserve partial artifacts, checks already run, missing acceptance criteria, and redacted evidence references. Partial or unavailable results never satisfy a dependency. A complete result also does not complete the task until the coordinator verifies every acceptance criterion.
+- A worker's failed terminal state does not by itself determine the task outcome. The coordinator may accept a deliverable only when the artifact exists and all acceptance criteria are independently verified; otherwise keep the task blocked pending recovery or mark it failed with evidence.
+- Keep a stable task ID across retries and append a unique attempt_id for every attempt, with its worker session, terminal state, result completeness, artifact/evidence references, and any previous_attempt_id. Never overwrite a failed attempt with a later success.
+- Choose an explicit recovery decision: retry, reassign, split, resume, accept_verified_deliverable, or fail. Record the rationale and coordinator decision. Retry only transient, idempotent work, and reconcile the previous worker before starting another attempt to avoid duplicate side effects.
+
+**Coordinator checkpoint and restart recovery**
+
+Use the host's native task state or session notes for a compact checkpoint; do not add a database or persistent scheduler. A checkpoint should include:
+
+~~~yaml
+checkpoint_schema_version: 1
+session_id: "sf-20261031-x7k2"
+checkpointed_at: "<timestamp>"
+tasks:
+  - id: "sf-20261031-x7k2-02"
+    status: "blocked"
+    depends_on: ["sf-20261031-x7k2-01"]
+    blocked_by: ["sf-20261031-x7k2-01"]
+    attempt_ids: ["sf-20261031-x7k2-02-a01"]
+    recovery_decision: "pending"
+~~~
+
+Record an attempt separately, including attempt_id, previous_attempt_id, host-issued worker_session_id when present, worker status/terminal state, result_completeness, artifact references, and evidence references. Checkpoint after material transitions: dispatch acceptance, confirmed worker identity/status, result receipt, task-state changes, and recovery decisions. An accepted dispatch remains queued until the host confirms an active session.
+
+On coordinator restart:
+
+1. Load the latest checkpoint and authoritative host task/session state; validate the session ID, task IDs, owners, dependency references, and acyclic graph.
+2. Reconcile every nonterminal worker with the host. Mark it active only if the host confirms it. If status cannot be observed, record unknown, block affected work, and do not redispatch an unobservable worker.
+3. Re-open referenced artifacts and verify completed-task acceptance evidence; re-derive readiness and all transitive blocked dependants.
+4. Require an explicit coordinator recovery decision before retrying, reassigning, splitting, or resuming. Preserve prior attempt IDs and failure evidence.
+5. If no durable checkpoint exists, reconstruct only from trusted host state, session notes, and verifiable repository artifacts. Keep uncertain work blocked and disclose the recovery limit; never claim full restart recovery.
+
+Checkpoints contain identifiers, statuses, paths, and redacted references only—never credentials, secrets, prompts, or full private logs. If the host cannot preserve task state across restarts, recovery is limited to the context that remains available.
 
 ## Map / reduce
 

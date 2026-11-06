@@ -48,7 +48,17 @@ Assign each researcher one specific question and source requirements. Require ex
 
 ## Failure recovery
 
-Classify worker failure as provider, permission, timeout, tool, context, workspace, or task-quality failure. Retry only transient, idempotent work. Preserve task lineage and report failures that cannot be safely recovered.
+1. Stop new dispatch to tasks whose prerequisites are no longer verified; preserve the original task and worker-session states separately.
+2. Collect the worker's terminal state, partial artifacts, completed checks, unmet acceptance criteria, and redacted evidence references. A partial result is useful evidence, not task completion.
+3. Classify the failure as provider, permission, capacity, timeout, transport, tool, context, workspace, or task-quality failure. Do not retry permanent permission, validation, or hard-quota failures.
+4. Block every not-yet-started transitive dependant and record the root task IDs in blocked_by. Do not mark descendants failed/cancelled solely because a dependency failed.
+5. Review active dependants individually. Do not automatically cancel them; if cancellation is necessary and supported, request it and verify the terminal state. Keep any work produced against invalid dependencies provisional.
+6. Choose and record an explicit coordinator decision: retry, reassign, split, resume, accept a fully verified deliverable, or fail. Retry only transient, idempotent work after reconciling the previous worker.
+7. Keep the task ID stable and append a unique attempt ID linked to the prior attempt. Preserve partial artifacts and failure evidence instead of overwriting them.
+8. Recompute readiness after a dependency is repaired and its acceptance criteria are verified. Unblock dependants only through a recorded graph revision.
+9. Checkpoint task transitions and recovery decisions in host-native task state or session notes. After coordinator restart, reconcile every nonterminal worker with the host before redispatch. If state cannot be recovered, keep uncertain tasks blocked and report the limitation.
+
+Do not claim durable crash recovery unless the host actually preserves the checkpoint and worker state.
 
 ## Final report
 
