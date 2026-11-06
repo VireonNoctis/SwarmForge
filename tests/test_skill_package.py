@@ -122,10 +122,10 @@ class SkillPackageTests(unittest.TestCase):
             "no durable checkpoint exists",
         ):
             with self.subTest(checkpoint_phrase=phrase):
-                self.assertIn(checkpoint_phrase.lower(), patterns.lower())
+                self.assertIn(phrase.lower(), patterns.lower())
 
         self.assertIn("restore the latest available checkpoint", skill.lower())
-        self.assertIn("before redispatch", skill.lower())
+        self.assertIn("before retrying or redispatching", skill.lower())
 
     def test_worker_dispatch_requires_an_observable_lifecycle(self) -> None:
         text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
