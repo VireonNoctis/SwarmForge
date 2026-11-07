@@ -96,7 +96,7 @@ Treat validation as a fail-closed gate, not a best-effort review. Validate the c
 1. **Session, task, and owner identity**
    - Require one non-empty session ID. Every task ID must be non-empty and unique within that session; reject duplicate task IDs before resolving any edges.
    - Every task has exactly one owner: `coordinator` or a host-issued worker-session ID actually returned and recorded in this session. The coordinator retains ownership until a worker's active state is confirmed. Role names, planned workers, queued requests, and guessed IDs are not owners.
-   - Every `attempt_id` is non-empty and unique across the session. Each attempt belongs to exactly one existing task. A `previous_attempt_id` must identify an earlier attempt of the same task; reject missing, cross-task, duplicate, self-referential, or cyclic attempt lineage.
+   - Every `attempt_id` is non-empty and unique across the session; reject duplicate attempt IDs before validating lineage. Each attempt belongs to exactly one existing task. A `previous_attempt_id` must identify an earlier attempt of the same task; reject missing, cross-task, duplicate, self-referential, or cyclic attempt lineage.
 2. **Dependency references**
    - Reject missing or cross-session dependency IDs, self-dependencies, and duplicate dependency edges. A task may depend on a given task only once.
    - Recompute `blocked_by` from the current graph and verified dependency outcomes; do not trust a stale saved list as proof that a task is unblocked.
