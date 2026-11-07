@@ -148,7 +148,7 @@ If any condition fails or is unknown, do not call `worker.create`. Record the de
 
 After a create request, record only the host-returned session ID. If the host reports the request as queued, keep the attempt `queued`, the task `ready`, and ownership with the coordinator; do not count a worker or create a duplicate attempt. Transfer ownership to the host-issued session ID and set the task `active` only after `worker.observe` confirms active state. If the request is accepted without a stable ID, or its outcome cannot be observed, mark the attempt `unknown`, block further dispatch for that task, and reconcile with the host before retrying. Never infer success from a submitted request.
 
-These are host-neutral coordinator procedures, not an executable graph parser, scheduler, or dispatch service shipped with the Skill. If the host cannot expose or preserve the required state, perform the checks manually where possible; if correctness or worker state remains unknown, stay in the single-agent fallback rather than claiming validation or dispatch succeeded.
+These are host-neutral coordinator procedures; SwarmForge does not ship an executable graph parser, scheduler, or dispatch service. If the host cannot expose or preserve the required state, perform the checks manually where possible; if correctness or worker state remains unknown, stay in the single-agent fallback rather than claiming validation or dispatch succeeded.
 
 ### Dependency failure, partial results, and recovery
 
