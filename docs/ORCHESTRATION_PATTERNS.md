@@ -46,6 +46,7 @@ Use this compact record:
 
 ~~~yaml
 session_id: "sf-20261031-x7k2"
+registry_revision: 1
 objective: "Deliver the user's requested outcome"
 requested_worker_cap: "<user-provided maximum>"
 tasks:
@@ -61,6 +62,7 @@ tasks:
     write_paths: []
     depends_on: []
     status: "ready"
+    state_history: []
     acceptance_criteria:
       - "Findings cite exact paths and identify a bounded implementation"
     verification_commands:
@@ -84,6 +86,60 @@ The cap is optional when the user has not supplied one; never infer host capacit
 - Keep task status separate from worker-session status. A queued dispatch is not an active task or a confirmed active agent; populate `worker_session_id` and `worker_status` only from host-confirmed session data.
 - Default to read-only tasks. Concurrent write paths must not overlap. Serialize shared-file work or reserve those paths for the coordinator; never rely on a role label as a file lock.
 - Mark a task complete only after its deliverable exists, its acceptance criteria are checked, and the coordinator has inspected the evidence. Record failed checks and unresolved risks in the result.
+
+### Pre-dispatch graph validation and admission
+
+Treat validation as a fail-closed gate, not a best-effort review. Validate the complete session registry after planning, immediately before every dispatch, and after any change to tasks, dependencies, owners, attempts, states, or acceptance evidence. Maintain a monotonic `registry_revision` in host task state or coordinator notes; increment it for every such mutation. Bind each validation and admission decision to the exact revision checked. A later mutation invalidates the earlier decision. If a consistent snapshot or revision cannot be established, admission is unknown and no worker is dispatched.
+
+**Validation sequence**
+
+1. **Session, task, and owner identity**
+   - Require one non-empty session ID. Every task ID must be non-empty and unique within that session; reject duplicate task IDs before resolving any edges.
+   - Every task has exactly one owner: `coordinator` or a host-issued worker-session ID actually returned and recorded in this session. The coordinator retains ownership until a worker's active state is confirmed. Role names, planned workers, queued requests, and guessed IDs are not owners.
+   - Every `attempt_id` is non-empty and unique across the session. Each attempt belongs to exactly one existing task. A `previous_attempt_id` must identify an earlier attempt of the same task; reject missing, cross-task, duplicate, self-referential, or cyclic attempt lineage.
+2. **Dependency references**
+   - Reject missing or cross-session dependency IDs, self-dependencies, and duplicate dependency edges. A task may depend on a given task only once.
+   - Recompute `blocked_by` from the current graph and verified dependency outcomes; do not trust a stale saved list as proof that a task is unblocked.
+   - Normalize read/write paths as repository-relative paths. Reject absolute paths and paths that escape the repository. Treat exact paths and ancestor/descendant directory paths as overlapping writes. Concurrent overlapping writes require isolated workspaces; otherwise serialize ownership.
+3. **Cycle detection and ordering**
+   - Run a topological sort over the full graph (for example, Kahn's algorithm), using task ID as a stable tie-breaker when several tasks are ready.
+   - If the sort emits fewer tasks than the registry contains, reject the graph and report the residual task IDs as cycle participants. Do not dispatch any task from an invalid graph.
+   - Missing references and duplicate edges must be rejected before cycle detection so the cycle report is not used to hide malformed input.
+4. **State and transition history**
+   - Accept only `planned`, `ready`, `active`, `blocked`, `completed`, `failed`, and `cancelled` as task states.
+   - Keep an append-only `state_history` (or equivalent host-native audit events). Each transition records `from`, `to`, actor, timestamp, registry revision, reason, and evidence references. Derive the current status from the last valid event; never silently overwrite a status field.
+   - Validate every transition against this table. Any transition not listed is invalid.
+
+| From | Allowed next state | Required condition |
+|---|---|---|
+| `planned` | `ready`, `blocked`, `cancelled` | `ready` only when every dependency is completed with verified acceptance evidence; `blocked` records its reason and root blockers |
+| `ready` | `active`, `blocked`, `cancelled` | `active` only after the coordinator starts the work or the host confirms the assigned worker is active |
+| `active` | `blocked`, `completed`, `failed`, `cancelled` | `completed` only after all acceptance criteria are verified; `cancelled` for worker-owned work only after cancellation is observed |
+| `blocked` | `planned`, `cancelled` | Return to `planned` only after blockers are repaired, the registry revision changes, and the full graph is revalidated |
+| `failed` | `planned`, `completed` | `planned` requires an explicit retry/reassign/resume decision and a new attempt; `completed` requires `accept_verified_deliverable` and coordinator verification |
+| `cancelled` | `planned` | Requires an explicit resume/reassign decision and reconciliation of the prior worker/attempt |
+| `completed` | none | Terminal; create a new corrective task rather than rewriting completed history |
+
+   - In particular, reject `planned → active`, `ready → completed`, `blocked → active`, and direct `failed/cancelled → active` transitions. A retry must pass through `planned` and create a new attempt.
+   - A task is `ready` only when all dependencies are completed and their acceptance evidence is verified, with no unresolved dependency blocker. A dependency that is merely queued, active, partial, unavailable, failed, cancelled, or unverified does not satisfy the prerequisite.
+5. **Attempts and write admission**
+   - Permit at most one unresolved attempt per task. `dispatch_pending`, `queued`, `active`, and `unknown` are unresolved; `unknown` is never treated as terminal.
+   - Before another attempt, reconcile the prior worker with the host and preserve its terminal state and artifacts. Never start a retry while the previous attempt may still be running.
+   - Verify read/write ownership and workspace isolation again at admission time; a valid graph does not make overlapping concurrent writes safe.
+
+**Dispatch-admission gate**
+
+Before each `worker.create`, the coordinator records an admission decision containing `task_id`, `registry_revision`, `decision` (`admitted` or `denied`), reasons, timestamp, and redacted evidence references. Admit a worker dispatch only when every condition below is true:
+
+1. The complete graph passed validation at the current `registry_revision`.
+2. The target task is `ready`; every dependency is `completed` with coordinator-verified acceptance evidence; recomputed `blocked_by` is empty.
+3. The task has exactly one valid owner, non-overlapping write ownership or confirmed workspace isolation, and no unresolved prior attempt.
+4. A new unique `attempt_id` is reserved and recorded as `dispatch_pending`; admission is then checked against the revision that includes this attempt.
+5. The current-session capability snapshot proves the required create/observe/result-collection lifecycle, stable session-ID contract, permission scope, and sufficient confirmed capacity. Apply nested-session and workspace safety gates from the Skill. Unknown required facts deny admission.
+
+If any condition fails or is unknown, do not call `worker.create`. Record the denial and keep the task non-active; a capacity/permission denial does not turn a valid dependency graph into task failure. Coordinator-owned single-agent work may start directly when `ready`, but it follows the same dependency, state-transition, and acceptance rules.
+
+After a create request, record only the host-returned session ID. If the host reports the request as queued, keep the attempt `queued`, the task `ready`, and ownership with the coordinator; do not count a worker or create a duplicate attempt. Transfer ownership to the host-issued session ID and set the task `active` only after `worker.observe` confirms active state. If the request is accepted without a stable ID, or its outcome cannot be observed, mark the attempt `unknown`, block further dispatch for that task, and reconcile with the host before retrying. Never infer success from a submitted request.
 
 ### Dependency failure, partial results, and recovery
 

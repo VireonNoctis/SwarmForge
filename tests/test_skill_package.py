@@ -73,6 +73,61 @@ class SkillPackageTests(unittest.TestCase):
         self.assertIn("attempts: []", patterns)
         self.assertIn("blocked_by: []", patterns)
 
+    def test_task_graph_validation_rejects_invalid_ids_edges_and_cycles(self) -> None:
+        patterns = (ROOT / "docs" / "ORCHESTRATION_PATTERNS.md").read_text(
+            encoding="utf-8"
+        )
+        for phrase in (
+            "Pre-dispatch graph validation and admission",
+            "registry_revision",
+            "duplicate task IDs",
+            "duplicate attempt IDs",
+            "missing or cross-session dependency IDs",
+            "self-dependencies",
+            "duplicate dependency edges",
+            "Kahn's algorithm",
+            "residual task IDs",
+            "append-only `state_history`",
+            "previous_attempt_id",
+            "at most one unresolved attempt per task",
+            "ancestor/descendant directory paths",
+        ):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase.lower(), patterns.lower())
+
+    def test_task_state_transitions_and_dispatch_admission_fail_closed(self) -> None:
+        patterns = (ROOT / "docs" / "ORCHESTRATION_PATTERNS.md").read_text(
+            encoding="utf-8"
+        )
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+
+        for phrase in (
+            "allowed next state",
+            "planned → active",
+            "ready → completed",
+            "blocked → active",
+            "completed",
+            "terminal",
+            "dispatch-admission gate",
+            "registry_revision",
+            "decision",
+            "dispatch_pending",
+            "worker.observe",
+            "mark the attempt `unknown`",
+            "do not call `worker.create`",
+        ):
+            with self.subTest(pattern=phrase):
+                self.assertIn(phrase.lower(), patterns.lower())
+
+        for phrase in (
+            "immediately before every dispatch",
+            "unknown required facts block dispatch",
+            "Do not call `worker.create`",
+            "keep coordinator ownership until the host confirms an active session",
+        ):
+            with self.subTest(skill_phrase=phrase):
+                self.assertIn(phrase.lower(), skill.lower())
+
     def test_partial_results_block_dependants_without_erasing_history(self) -> None:
         patterns = (ROOT / "docs" / "ORCHESTRATION_PATTERNS.md").read_text(
             encoding="utf-8"

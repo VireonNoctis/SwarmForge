@@ -113,8 +113,8 @@ The number of planned tasks is not the number of active agents. The host's actua
 
 1. Read repository instructions such as `AGENTS.md`, current branch/worktree state, relevant source, tests, and existing conventions.
 2. Convert the request into clear outcomes and acceptance criteria.
-3. Create one compact project brief and dependency-aware task graph using the task contract in `docs/ORCHESTRATION_PATTERNS.md`. Give tasks unique session-scoped IDs and verify that every dependency exists and the graph is acyclic before dispatch.
-4. Give each task exactly one accountable owner, a measurable objective, context/source references, explicit read/write paths, dependencies, acceptance criteria, verification commands, and a concrete deliverable. Track task state separately from worker-session state.
+3. Create one compact project brief and dependency-aware task graph using the task contract in `docs/ORCHESTRATION_PATTERNS.md`. Run its complete pre-dispatch validation: reject duplicate task/attempt IDs, duplicate or self-dependencies, missing references, cycles, invalid ownership, and invalid state history. Revalidate immediately before every dispatch and after any registry mutation; unknown required facts block dispatch.
+4. Give each task exactly one accountable owner, a measurable objective, context/source references, explicit read/write paths, dependencies, acceptance criteria, verification commands, and a concrete deliverable. Record append-only state transitions and validate each transition against the allowed lifecycle. Track task state separately from worker-session state.
 5. Assign file ownership before concurrent editing. Prefer read-only research first.
 6. Keep final integration and verification under coordinator ownership.
 
@@ -128,6 +128,8 @@ Use this preference order:
 2. Native agent teams when peer communication or shared task state is useful.
 3. An already configured and authorized external integration, if the host's native features are insufficient.
 4. A single-agent plan when no real delegation capability is available.
+
+Before every worker creation, apply the dispatch-admission gate in `docs/ORCHESTRATION_PATTERNS.md` against the current registry revision. Do not call `worker.create` when graph validation fails, the task is not `ready`, dependencies lack verified acceptance evidence, an attempt is unresolved, or any required permission/capacity fact is unknown. A queued acceptance is not an active task or confirmed worker; keep coordinator ownership until the host confirms an active session.
 
 Do not ask the user to install or build an orchestrator merely to use this Skill. Only discuss a new external service or companion application when the user explicitly asks for one or makes it a separate requirement.
 
