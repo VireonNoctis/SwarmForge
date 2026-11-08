@@ -185,12 +185,13 @@ For the capacity model and evidence required for a 500-session claim, read `docs
 2. Apply the dependency-failure rules in docs/ORCHESTRATION_PATTERNS.md: block transitive dependants, keep active dependants provisional, and never treat partial results as satisfying dependencies.
 3. Reconcile nonterminal workers with the host before retrying or redispatching. After coordinator restart, restore the latest available checkpoint and do not duplicate an unobservable worker.
 4. Record an explicit recovery decision and preserve attempt lineage before retrying, reassigning, splitting, or resuming work.
-5. Check for scope drift, fabricated details, duplicate work, incompatible assumptions, and missing evidence.
-6. Integrate in dependency order. Resolve patch conflicts deliberately; never accept a patch merely because it arrived first.
-7. Run relevant tests, builds, lint, type, and security checks available in the project.
-8. For substantial work, ask an independent reviewer to inspect the combined diff, not just worker summaries.
-9. Re-run affected checks after resolving conflicts or making final changes.
-10. Identify checks that could not be run. A worker's assertion is not proof unless its command and result are visible or independently reproduced.
+5. Correlate each result to its exact recorded task, task-spec revision, attempt, dispatch revision, and host-issued worker session. Validate declared artifact slots, producer provenance, allowed paths, immutable references or coordinator-computed digests, and evidence for every acceptance criterion. Quarantine stale, mismatched, unexpected, or out-of-scope artifacts; do not integrate them.
+6. Check for scope drift, fabricated details, duplicate work, incompatible assumptions, and missing evidence.
+7. Integrate only coordinator-accepted artifacts in dependency order. Resolve patch conflicts deliberately; never accept a patch merely because it arrived first.
+8. Run relevant tests, builds, lint, type, and security checks available in the project.
+9. For substantial work, ask an independent reviewer to inspect the combined diff, not just worker summaries.
+10. Re-run affected checks after resolving conflicts or making final changes.
+11. Identify checks that could not be run. A worker's assertion is not proof unless its command and result are visible or independently reproduced.
 
 ## 10. Report honestly
 

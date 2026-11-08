@@ -165,6 +165,59 @@ class SkillPackageTests(unittest.TestCase):
         self.assertIn("partial artifacts", workflows.lower())
         self.assertIn("transitive dependant", workflows.lower())
 
+    def test_result_integrity_binds_artifacts_to_task_attempt_and_revision(self) -> None:
+        patterns = (ROOT / "docs" / "ORCHESTRATION_PATTERNS.md").read_text(
+            encoding="utf-8"
+        )
+        adapter = (ROOT / "docs" / "ADAPTER_CONTRACT.md").read_text(
+            encoding="utf-8"
+        )
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+
+        combined = patterns.lower() + adapter.lower()
+        for phrase in (
+            "Result integrity and coordinator acceptance",
+            "task_spec_revision",
+            "dispatch_registry_revision",
+            "exact correlation tuple",
+            "late result from a superseded attempt",
+            "expected_artifacts",
+            "producer_attempt_id",
+            "all acceptance criteria",
+            "coordinator_verification",
+            "sha-256",
+            "digest establishes byte identity",
+            "does not prove authorship",
+        ):
+            with self.subTest(pattern=phrase):
+                self.assertIn(phrase.lower(), combined)
+
+        self.assertIn(
+            "Quarantine stale, mismatched, unexpected, or out-of-scope artifacts",
+            skill,
+        )
+
+    def test_artifact_verification_rejects_path_escape_and_untrusted_execution(self) -> None:
+        security = (ROOT / "docs" / "SECURITY_MODEL.md").read_text(
+            encoding="utf-8"
+        )
+        patterns = (ROOT / "docs" / "ORCHESTRATION_PATTERNS.md").read_text(
+            encoding="utf-8"
+        )
+        adapter = (ROOT / "docs" / "ADAPTER_CONTRACT.md").read_text(
+            encoding="utf-8"
+        )
+        combined = security.lower() + patterns.lower() + adapter.lower()
+        for phrase in (
+            "reject absolute paths, traversal, and symlink escapes",
+            "approved, authorized store",
+            "do not execute an artifact merely to verify it",
+            "worker-supplied digest is only a hint",
+            "out-of-scope artifacts",
+        ):
+            with self.subTest(security_phrase=phrase):
+                self.assertIn(phrase.lower(), combined)
+
     def test_coordinator_recovery_reconciles_before_redispatch(self) -> None:
         patterns = (ROOT / "docs" / "ORCHESTRATION_PATTERNS.md").read_text(
             encoding="utf-8"

@@ -247,14 +247,18 @@ Normalize outcomes without hiding the provider's original evidence:
 Use this attempt-level record when an adapter returns a result:
 
 ~~~yaml
-attempt_id: "sf-20261031-x7k2-02-a01"
+session_id: "sf-20261108-r9m4"
+task_id: "sf-20261108-r9m4-02"
+task_spec_revision: 1
+dispatch_registry_revision: 4
+attempt_id: "sf-20261108-r9m4-02-a01"
 previous_attempt_id: null
-worker_session_id: null
+worker_session_id: "<host-issued ID, or null for coordinator-owned work>"
 worker_terminal_state: null
 result_completeness: "complete|partial|unavailable"
 artifact_refs: []
-evidence_refs: []
-acceptance_criteria_verified: false
+acceptance_evidence_refs: []
+coordinator_acceptance: "pending|accepted|rejected"
 unmet_criteria: []
 ~~~
 
@@ -316,6 +320,7 @@ Illustrative logical payload (not a universal API schema):
 ~~~json
 {
   "task_id": "stable-id",
+  "task_spec_revision": 1,
   "title": "Review API error handling",
   "role": "reviewer",
   "objective": "Find correctness and compatibility issues",
@@ -324,8 +329,11 @@ Illustrative logical payload (not a universal API schema):
   "write_paths": [],
   "dependencies": [],
   "acceptance_criteria": [
-    "Findings include exact file and line references",
-    "Each issue includes impact and evidence"
+    {"id": "AC-01", "description": "Findings include exact file and line references"},
+    {"id": "AC-02", "description": "Each issue includes impact and evidence"}
+  ],
+  "expected_artifacts": [
+    {"slot_id": "OUT-01", "kind": "report", "required": true, "allowed_paths": [], "approved_store": "host-issued session artifact reference", "satisfies": ["AC-01", "AC-02"]}
   ],
   "deliverable": "structured findings",
   "mode": "read_only"
@@ -336,7 +344,44 @@ Do not send fields unsupported by the concrete provider API.
 
 ## Result envelope
 
-Results should include task ID, worker/session ID, terminal status, summary, changed paths or patch reference, checks and outputs, assumptions, unresolved issues, timestamps, usage/cost when available, and errors. Reject or mark incomplete any result that cannot be tied to its originating task.
+A result must echo the identifiers and revisions from its recorded dispatch attempt. Use this portable envelope as a mapping aid, not as a universal provider schema:
+
+~~~yaml
+schema_version: 1
+session_id: "<session ID>"
+task_id: "<stable task ID>"
+task_spec_revision: 1
+attempt_id: "<unique attempt ID>"
+dispatch_registry_revision: 4
+worker_session_id: "<host-issued ID, or null for coordinator-owned work>"
+terminal_state: "<host-confirmed terminal state, or null for coordinator-owned work>"
+result_completeness: "complete|partial|unavailable"
+artifacts:
+  - artifact_id: "<unique artifact instance ID>"
+    slot_id: "<declared expected-artifact slot>"
+    producer_task_id: "<task ID>"
+    producer_attempt_id: "<attempt ID>"
+    locator: "<repository-relative path or approved artifact reference>"
+    immutable_ref: null
+    byte_length: null
+    content_digest:
+      algorithm: "sha-256"
+      value: null
+    acceptance_criteria_ids: ["<criterion ID>"]
+acceptance_evidence:
+  - criterion_id: "<criterion ID>"
+    artifact_ids: ["<artifact ID>"]
+    evidence_ref: "<redacted reference>"
+    verification_command: "<exact command or inspection method>"
+~~~
+
+The task brief must declare `task_spec_revision`, stable acceptance-criterion IDs, and `expected_artifacts` slots before dispatch. Each slot defines its kind, whether it is required, allowed paths or approved store, and the criterion IDs it can satisfy. A task with no file/patch outputs declares an empty list, but still supplies evidence for every criterion.
+
+The coordinator—not the worker—records acceptance. Correlate the exact tuple `(session_id, task_id, task_spec_revision, attempt_id, dispatch_registry_revision, worker_session_id)` against the admission and attempt records. The dispatch revision must match the attempt's historical admission revision; it need not equal the current global revision. A late/superseded attempt, stale task revision, mismatched session, duplicate slot, missing required artifact, unexpected artifact, wrong producer ID, or out-of-scope locator is quarantined and cannot satisfy current acceptance.
+
+Retrieve every required artifact and verify its kind, provenance, and allowed path boundary. Prefer an immutable host-issued artifact reference; otherwise the coordinator computes SHA-256 over the exact retrieved bytes and rechecks it before integration. A worker-supplied digest is only a hint. A digest proves byte identity against a value, not authorship, correctness, or safety.
+
+Map every acceptance criterion to concrete evidence and independently execute its verification command or inspection. Record pass/fail/unknown per criterion. Missing evidence or an unrun required check is unknown. Do not integrate or complete the task unless correlation matches, the result is complete, all required artifacts are verified, every criterion passes, and dependencies are valid. Preserve quarantined or partial artifacts as untrusted history; do not silently discard or execute them.
 
 ## Workspace contract
 

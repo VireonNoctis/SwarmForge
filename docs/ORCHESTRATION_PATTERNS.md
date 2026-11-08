@@ -51,6 +51,7 @@ objective: "Deliver the user's requested outcome"
 requested_worker_cap: "<user-provided maximum>"
 tasks:
   - id: "sf-20261031-x7k2-01"
+    task_spec_revision: 1
     owner: "coordinator"
     objective: "Inspect the existing task lifecycle and identify the smallest safe change"
     context_refs:
@@ -71,7 +72,16 @@ tasks:
         reason: "No dependencies; the task is ready to start"
         evidence_refs: []
     acceptance_criteria:
-      - "Findings cite exact paths and identify a bounded implementation"
+      - id: "AC-01"
+        description: "Findings cite exact paths and identify a bounded implementation"
+        verification: "Coordinator checks cited paths and scope"
+    expected_artifacts:
+      - slot_id: "OUT-01"
+        kind: "report"
+        required: true
+        allowed_paths: []
+        approved_store: "host-issued session artifact reference"
+        satisfies: ["AC-01"]
     verification_commands:
       - "python3 -m unittest discover -s tests -v"
     deliverable: "Evidence-backed implementation brief"
@@ -92,7 +102,7 @@ The cap is optional when the user has not supplied one; never infer host capacit
 - A failed or cancelled dependency blocks its dependants until the coordinator deliberately revises the graph and records the reason. Do not silently treat failure as completion.
 - Keep task status separate from worker-session status. A queued dispatch is not an active task or a confirmed active agent; populate `worker_session_id` and `worker_status` only from host-confirmed session data.
 - Default to read-only tasks. Concurrent write paths must not overlap. Serialize shared-file work or reserve those paths for the coordinator; never rely on a role label as a file lock.
-- Mark a task complete only after its deliverable exists, its acceptance criteria are checked, and the coordinator has inspected the evidence. Record failed checks and unresolved risks in the result.
+- Mark a task complete only after every required artifact slot is satisfied, every acceptance criterion has coordinator-verified evidence, and the coordinator has inspected the exact deliverables. Record failed checks and unresolved risks in the result.
 
 ### Pre-dispatch graph validation and admission
 
@@ -169,6 +179,68 @@ Treat graph readiness as an evidence-derived condition, not a dispatch preferenc
 - A worker's failed terminal state does not by itself determine the task outcome. The coordinator may accept a deliverable only when the artifact exists and all acceptance criteria are independently verified; otherwise keep the task blocked pending recovery or mark it failed with evidence.
 - Keep a stable task ID across retries and append a unique attempt_id for every attempt, with its worker session, terminal state, result completeness, artifact/evidence references, and any previous_attempt_id. Never overwrite a failed attempt with a later success.
 - Choose an explicit recovery decision: retry, reassign, split, resume, accept_verified_deliverable, or fail. Record the rationale and coordinator decision. Retry only transient, idempotent work, and reconcile the previous worker before starting another attempt to avoid duplicate side effects.
+
+### Result integrity and coordinator acceptance
+
+A returned result is admissible evidence only when it is bound to the exact task specification and attempt that produced it. Add a monotonically increasing `task_spec_revision` to each task. Increment it whenever the objective, context/input references, dependencies, read/write boundaries, acceptance criteria, or expected artifact slots change. Record `dispatch_registry_revision` on the admitted attempt. A result must echo both recorded values. The dispatch revision is historical: it must match that attempt's admission record, but it need not equal the registry's current revision when the result arrives.
+
+Declare acceptance criteria with stable IDs and expected artifact slots before dispatch. A task with no file or patch output must explicitly declare `expected_artifacts: []`; it still needs evidence for every acceptance criterion.
+
+Use this result envelope (a portable record, not a provider API schema):
+
+~~~yaml
+schema_version: 1
+session_id: "sf-20261108-r9m4"
+task_id: "sf-20261108-r9m4-02"
+task_spec_revision: 1
+attempt_id: "sf-20261108-r9m4-02-a01"
+dispatch_registry_revision: 4
+worker_session_id: "<host-issued ID, or null for coordinator-owned work>"
+terminal_state: "<host-confirmed terminal state, or null for coordinator-owned work>"
+result_completeness: "complete|partial|unavailable"
+summary: "<concise outcome>"
+artifacts:
+  - artifact_id: "artifact-01"
+    slot_id: "OUT-01"
+    producer_task_id: "sf-20261108-r9m4-02"
+    producer_attempt_id: "sf-20261108-r9m4-02-a01"
+    locator: "<repository-relative path or approved immutable reference>"
+    immutable_ref: null
+    byte_length: null
+    content_digest:
+      algorithm: "sha-256"
+      value: null
+    acceptance_criteria_ids: ["AC-01"]
+acceptance_evidence:
+  - criterion_id: "AC-01"
+    artifact_ids: ["artifact-01"]
+    evidence_ref: "<redacted reference>"
+    verification_command: "<exact command or inspection method>"
+~~~
+
+The coordinator maintains a separate acceptance record; worker-supplied verification claims are never authoritative:
+
+~~~yaml
+coordinator_verification:
+  result_correlation: "pending|matched|mismatch"
+  artifact_integrity: "pending|verified|mismatch|unknown"
+  criterion_outcomes:
+    AC-01: "pending|pass|fail|unknown"
+  accepted: false
+  accepted_at: null
+  evidence_refs: []
+~~~
+
+Apply this sequence before integration or dependency completion:
+
+1. Match the exact correlation tuple `(session_id, task_id, task_spec_revision, attempt_id, dispatch_registry_revision, worker_session_id)` against the task, admission record, and attempt history. A worker task requires the exact host-issued worker ID; `null` is valid only for coordinator-owned single-agent work.
+2. Require the result's `task_spec_revision` to match the current task specification. A late result from a superseded attempt, a different worker session, or an older task revision is historical evidence only; quarantine it from current acceptance and preserve it without overwriting newer attempts.
+3. Match each artifact to one declared `expected_artifacts.slot_id`. Reject duplicate artifact IDs, duplicate slot claims, wrong producer task/attempt IDs, missing required slots, unexpected artifacts, and locators outside the task's allowed write paths or approved artifact store. Preserve unexpected material in quarantine; do not silently discard it.
+4. Retrieve the exact artifact. Verify it exists, is the declared kind, remains within the allowed path boundary, and has not escaped through path traversal or a symlink. Prefer an immutable host-issued artifact reference. Otherwise compute SHA-256 over the exact retrieved bytes and recheck that digest immediately before integration. Never trust a worker-supplied digest without independently recomputing it.
+5. Map every acceptance criterion ID to concrete artifact/evidence references and independently run its declared verification command or inspection. Record `pass`, `fail`, or `unknown` per criterion with exact evidence. Missing evidence or an unrun required check is `unknown`, not pass.
+6. Accept only when the result is complete, correlation matches, every required artifact slot is verified, every acceptance criterion is `pass`, and no dependency is provisional. Otherwise keep the task incomplete/blocked and prevent its dependants from becoming ready.
+
+A digest establishes byte identity against a recorded value; it does not prove authorship, correctness, or safety. Inspect patches and data as untrusted input. Do not execute an artifact merely to verify its identity. Quarantine is a logical trust boundary in host state or coordinator notes; do not move or delete files unless a separately authorized host operation makes that safe.
 
 **Coordinator checkpoint and restart recovery**
 

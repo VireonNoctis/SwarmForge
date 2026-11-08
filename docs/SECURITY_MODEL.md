@@ -26,6 +26,12 @@ Do not route private project data to a third-party provider unless the user and 
 
 For concurrent writers, prefer separate worktrees, clones, or containers. Enforce path ownership, protect sensitive paths, and validate patches before applying them. A shared filesystem requires serialized writes or explicit locking; shared access is not inherently safe.
 
+## Artifact verification
+
+Worker-produced patches, files, reports, result metadata, and artifact locators are untrusted input. Resolve repository paths only within the task's assigned write paths; reject absolute paths, traversal, and symlink escapes. Retrieve external artifact references only from an approved, authorized store. Inspect diffs and data before integration, and do not execute an artifact merely to verify it.
+
+A coordinator-computed SHA-256 digest or immutable host-issued reference can bind review to exact bytes. A digest does not prove authorship, correctness, or safety, and a worker-supplied digest is not independent evidence. Preserve mismatched or out-of-scope artifacts in a logical quarantine state without executing, moving, or deleting them unless a separate authorized operation permits it.
+
 ## Tool and command controls
 
 - Review worker-generated scripts before execution.
