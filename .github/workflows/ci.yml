@@ -23,6 +23,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install maintainer validation dependencies
+        run: python3 -m pip install --disable-pip-version-check --no-input -r requirements-dev.txt
+
       - name: Validate Skill and repository configuration
         run: python3 scripts/validate.py
 

@@ -27,8 +27,14 @@ REQUIRED_DOCS = (
     "docs/SECURITY_MODEL.md",
     "docs/SOURCES.md",
     "docs/WORKFLOWS.md",
+    "docs/schemas/task-registry.schema.json",
+    "docs/schemas/result-envelope.schema.json",
 )
 ACTION_REFERENCE = re.compile(r"^[0-9a-fA-F]{40}$")
+CONTRACT_SCHEMAS = (
+    ("docs/schemas/task-registry.schema.json", "tests/fixtures/contracts/task-registry.json"),
+    ("docs/schemas/result-envelope.schema.json", "tests/fixtures/contracts/result-envelope.json"),
+)
 LINK = re.compile(r"!?\[[^]]*\]\(([^)]+)\)")
 FIELD = re.compile(r"^([a-z][a-z0-9_-]*):\s*(.*?)\s*$")
 
@@ -43,6 +49,83 @@ def validate_json_files() -> list[str]:
             json.loads(path.read_text(encoding="utf-8"))
         except (OSError, UnicodeError, json.JSONDecodeError) as exc:
             errors.append(f"{relative_path}: invalid JSON ({exc})")
+    return errors
+
+
+
+def validate_contract_schemas() -> list[str]:
+    """Validate Draft 2020-12 schemas and named positive/negative fixtures."""
+    try:
+        import jsonschema
+    except ImportError:
+        return [
+            "JSON Schema validation requires development dependencies; "
+            "run python3 -m pip install -r requirements-dev.txt"
+        ]
+
+    errors: list[str] = []
+    format_checker = jsonschema.FormatChecker()
+
+    for schema_relative, fixture_relative in CONTRACT_SCHEMAS:
+        try:
+            schema = json.loads((ROOT / schema_relative).read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            errors.append(f"{schema_relative}: cannot load JSON Schema ({exc})")
+            continue
+
+        try:
+            jsonschema.Draft202012Validator.check_schema(schema)
+        except jsonschema.exceptions.SchemaError as exc:
+            errors.append(f"{schema_relative}: invalid Draft 2020-12 schema ({exc.message})")
+            continue
+
+        try:
+            bundle = json.loads((ROOT / fixture_relative).read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            errors.append(f"{fixture_relative}: cannot load fixture bundle ({exc})")
+            continue
+
+        if not isinstance(bundle, dict) or set(bundle) != {"valid", "invalid"}:
+            errors.append(f"{fixture_relative}: expected exactly 'valid' and 'invalid' arrays")
+            continue
+
+        validator = jsonschema.Draft202012Validator(schema, format_checker=format_checker)
+        for expectation in ("valid", "invalid"):
+            examples = bundle[expectation]
+            if not isinstance(examples, list) or not examples:
+                errors.append(f"{fixture_relative}: '{expectation}' must be a non-empty array")
+                continue
+
+            names: set[str] = set()
+            for index, example in enumerate(examples, start=1):
+                if (
+                    not isinstance(example, dict)
+                    or not isinstance(example.get("name"), str)
+                    or not example["name"].strip()
+                    or not isinstance(example.get("document"), dict)
+                    or set(example) != {"name", "document"}
+                ):
+                    errors.append(
+                        f"{fixture_relative}: {expectation}[{index}] must contain only "
+                        "'name' and object-valued 'document'"
+                    )
+                    continue
+
+                name = example["name"]
+                if name in names:
+                    errors.append(f"{fixture_relative}: duplicate {expectation} fixture name {name!r}")
+                    continue
+                names.add(name)
+
+                instance_errors = list(validator.iter_errors(example["document"]))
+                label = f"{fixture_relative}#{expectation}/{name}"
+                if expectation == "valid" and instance_errors:
+                    first = instance_errors[0]
+                    location = "/".join(str(part) for part in first.absolute_path) or "$"
+                    errors.append(f"{label}: expected valid; {location}: {first.message}")
+                elif expectation == "invalid" and not instance_errors:
+                    errors.append(f"{label}: invalid fixture unexpectedly passed")
+
     return errors
 
 
@@ -147,6 +230,7 @@ def validate_local_links() -> list[str]:
 
 def main() -> int:
     errors = validate_json_files()
+    errors.extend(validate_contract_schemas())
     errors.extend(validate_action_pins())
     errors.extend(validate_skill_frontmatter())
 
@@ -162,6 +246,7 @@ def main() -> int:
     if errors:
         print("\n".join(f"ERROR: {item}" for item in errors), file=sys.stderr)
         return 1
+    print("JSON Schema contract fixtures passed.")
     print("SwarmForge Skill package checks passed.")
     return 0
 

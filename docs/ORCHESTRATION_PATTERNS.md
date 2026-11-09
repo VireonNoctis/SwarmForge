@@ -45,10 +45,11 @@ Generate a unique session ID for each invocation, then number tasks within it (f
 Use this compact record:
 
 ~~~yaml
+schema_version: 1
 session_id: "sf-20261031-x7k2"
 registry_revision: 1
 objective: "Deliver the user's requested outcome"
-requested_worker_cap: "<user-provided maximum>"
+requested_worker_cap: 4
 tasks:
   - id: "sf-20261031-x7k2-01"
     task_spec_revision: 1
@@ -67,7 +68,7 @@ tasks:
       - from: null
         to: "ready"
         actor: "coordinator"
-        recorded_at: "<timestamp>"
+        recorded_at: "2026-10-31T14:00:00Z"
         registry_revision: 1
         reason: "No dependencies; the task is ready to start"
         evidence_refs: []
@@ -92,6 +93,14 @@ tasks:
     blocked_by: []
     recovery_decision: null
 ~~~
+
+### Machine-readable contract schemas
+
+The registry example above is version 1 and has a structural schema at [task-registry.schema.json](schemas/task-registry.schema.json). The portable worker result envelope is described by [result-envelope.schema.json](schemas/result-envelope.schema.json). Valid and intentionally invalid examples are collected in [the contract fixtures](../tests/fixtures/contracts/).
+
+CI validates both schemas against JSON Schema Draft 2020-12 and checks every named fixture with the pinned maintainer-only validator dependency. This gives host adapters a concrete, provider-neutral interchange shape without adding a runtime dependency to Skill users.
+
+JSON Schema checks record structure and local field constraints only. It cannot establish task-ID uniqueness, dependency existence or acyclicity, write-path overlap, legal state-history transitions, attempt lineage, host-issued ownership, correlation between a result and its admitted attempt, or cross-record artifact/acceptance completeness. The coordinator must continue enforcing those semantic invariants from this document; a structurally valid record is not automatically safe to dispatch or accept.
 
 The cap is optional when the user has not supplied one; never infer host capacity from a requested cap. Keep references narrow and use repository-relative paths. Add fields only when they improve coordination.
 
@@ -186,7 +195,7 @@ A returned result is admissible evidence only when it is bound to the exact task
 
 Declare acceptance criteria with stable IDs and expected artifact slots before dispatch. A task with no file or patch output must explicitly declare `expected_artifacts: []`; it still needs evidence for every acceptance criterion.
 
-Use this result envelope (a portable record, not a provider API schema):
+Use this result envelope (a portable record, not a provider API schema) with the structural contract in [result-envelope.schema.json](schemas/result-envelope.schema.json):
 
 ~~~yaml
 schema_version: 1

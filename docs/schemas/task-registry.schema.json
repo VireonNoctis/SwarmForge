@@ -1,0 +1,453 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/VireonNoctis/SwarmForge/main/docs/schemas/task-registry.schema.json",
+  "title": "SwarmForge task registry",
+  "description": "Structural contract for one session-local task registry. Graph and lifecycle invariants require coordinator-side semantic validation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "session_id",
+    "registry_revision",
+    "objective",
+    "tasks"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "session_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "registry_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "objective": {
+      "$ref": "#/$defs/non_empty"
+    },
+    "requested_worker_cap": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/task"
+      }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^\\S(?:.*\\S)?$",
+      "maxLength": 256
+    },
+    "non_empty": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^\\S(?:.*\\S)?$"
+    },
+    "repository_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|/)\\.\\.?(/|$))(?!.*\\\\)[^\\r\\n]+$"
+    },
+    "task_state": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "ready",
+        "active",
+        "blocked",
+        "completed",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "string_list": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^\\S(?:.*\\S)?$"
+      },
+      "uniqueItems": true
+    },
+    "repository_path_list": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|/)\\.\\.?(/|$))(?!.*\\\\)[^\\r\\n]+$"
+      },
+      "uniqueItems": true
+    },
+    "state_transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "actor",
+        "recorded_at",
+        "registry_revision",
+        "reason",
+        "evidence_refs"
+      ],
+      "properties": {
+        "from": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/task_state"
+            }
+          ]
+        },
+        "to": {
+          "$ref": "#/$defs/task_state"
+        },
+        "actor": {
+          "$ref": "#/$defs/identifier"
+        },
+        "recorded_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "registry_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "reason": {
+          "$ref": "#/$defs/non_empty"
+        },
+        "evidence_refs": {
+          "$ref": "#/$defs/string_list"
+        }
+      }
+    },
+    "acceptance_criterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "description",
+        "verification"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "description": {
+          "$ref": "#/$defs/non_empty"
+        },
+        "verification": {
+          "$ref": "#/$defs/non_empty"
+        }
+      }
+    },
+    "artifact_slot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slot_id",
+        "kind",
+        "required",
+        "allowed_paths",
+        "satisfies"
+      ],
+      "properties": {
+        "slot_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "kind": {
+          "$ref": "#/$defs/non_empty"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "allowed_paths": {
+          "$ref": "#/$defs/repository_path_list"
+        },
+        "approved_store": {
+          "$ref": "#/$defs/non_empty"
+        },
+        "satisfies": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "uniqueItems": true
+        }
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "allowed_paths": {
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "required": [
+            "approved_store"
+          ]
+        }
+      ]
+    },
+    "attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempt_id",
+        "dispatch_registry_revision"
+      ],
+      "properties": {
+        "attempt_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "previous_attempt_id": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/identifier"
+            }
+          ]
+        },
+        "dispatch_registry_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "worker_session_id": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/identifier"
+            }
+          ]
+        },
+        "worker_status": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/non_empty"
+            }
+          ]
+        },
+        "terminal_state": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/non_empty"
+            }
+          ]
+        },
+        "result_completeness": {
+          "type": "string",
+          "enum": [
+            "complete",
+            "partial",
+            "unavailable"
+          ]
+        },
+        "result_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/non_empty"
+            }
+          ]
+        },
+        "artifact_refs": {
+          "$ref": "#/$defs/string_list"
+        },
+        "acceptance_evidence_refs": {
+          "$ref": "#/$defs/string_list"
+        },
+        "recovery_decision": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "enum": [
+                "retry",
+                "reassign",
+                "split",
+                "resume",
+                "accept_verified_deliverable",
+                "fail"
+              ]
+            }
+          ]
+        },
+        "recorded_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reason": {
+          "$ref": "#/$defs/non_empty"
+        }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "task_spec_revision",
+        "owner",
+        "objective",
+        "context_refs",
+        "read_paths",
+        "write_paths",
+        "depends_on",
+        "status",
+        "state_history",
+        "acceptance_criteria",
+        "expected_artifacts",
+        "verification_commands",
+        "deliverable",
+        "worker_session_id",
+        "worker_status",
+        "result_ref",
+        "attempts",
+        "blocked_by",
+        "recovery_decision"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "task_spec_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "owner": {
+          "$ref": "#/$defs/identifier"
+        },
+        "objective": {
+          "$ref": "#/$defs/non_empty"
+        },
+        "context_refs": {
+          "$ref": "#/$defs/string_list"
+        },
+        "read_paths": {
+          "$ref": "#/$defs/repository_path_list"
+        },
+        "write_paths": {
+          "$ref": "#/$defs/repository_path_list"
+        },
+        "depends_on": {
+          "$ref": "#/$defs/string_list"
+        },
+        "status": {
+          "$ref": "#/$defs/task_state"
+        },
+        "state_history": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/state_transition"
+          }
+        },
+        "acceptance_criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/acceptance_criterion"
+          }
+        },
+        "expected_artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact_slot"
+          }
+        },
+        "verification_commands": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/non_empty"
+          }
+        },
+        "deliverable": {
+          "$ref": "#/$defs/non_empty"
+        },
+        "worker_session_id": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/identifier"
+            }
+          ]
+        },
+        "worker_status": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/non_empty"
+            }
+          ]
+        },
+        "result_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/non_empty"
+            }
+          ]
+        },
+        "attempts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attempt"
+          }
+        },
+        "blocked_by": {
+          "$ref": "#/$defs/string_list"
+        },
+        "recovery_decision": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "enum": [
+                "retry",
+                "reassign",
+                "split",
+                "resume",
+                "accept_verified_deliverable",
+                "fail"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "valid": [
+    {
+      "name": "coordinator-owned",
+      "document": {
+        "schema_version": 1,
+        "session_id": "sf-20261109-r10q6",
+        "task_id": "sf-20261109-r10q6-01",
+        "task_spec_revision": 1,
+        "attempt_id": "sf-20261109-r10q6-01-a01",
+        "dispatch_registry_revision": 3,
+        "worker_session_id": null,
+        "terminal_state": null,
+        "result_completeness": "complete",
+        "summary": "Created the schemas and verified fixture contracts.",
+        "artifacts": [],
+        "acceptance_evidence": [
+          {
+            "criterion_id": "AC-01",
+            "artifact_ids": [],
+            "evidence_ref": "commit:abc123",
+            "verification_command": "python3 scripts/validate.py"
+          }
+        ]
+      }
+    },
+    {
+      "name": "worker-owned",
+      "document": {
+        "schema_version": 1,
+        "session_id": "sf-20261109-r10q6",
+        "task_id": "sf-20261109-r10q6-01",
+        "task_spec_revision": 1,
+        "attempt_id": "sf-20261109-r10q6-01-a01",
+        "dispatch_registry_revision": 3,
+        "worker_session_id": "host-worker-123",
+        "terminal_state": "completed",
+        "result_completeness": "complete",
+        "summary": "Created the schemas and verified fixture contracts.",
+        "artifacts": [
+          {
+            "artifact_id": "artifact-01",
+            "slot_id": "OUT-01",
+            "producer_task_id": "sf-20261109-r10q6-01",
+            "producer_attempt_id": "sf-20261109-r10q6-01-a01",
+            "locator": "docs/schemas/task-registry.schema.json",
+            "immutable_ref": null,
+            "byte_length": 512,
+            "content_digest": {
+              "algorithm": "sha-256",
+              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "acceptance_criteria_ids": [
+              "AC-01"
+            ]
+          }
+        ],
+        "acceptance_evidence": [
+          {
+            "criterion_id": "AC-01",
+            "artifact_ids": [
+              "artifact-01"
+            ],
+            "evidence_ref": "commit:abc123",
+            "verification_command": "python3 scripts/validate.py"
+          }
+        ]
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "name": "invalid-digest",
+      "document": {
+        "schema_version": 1,
+        "session_id": "sf-20261109-r10q6",
+        "task_id": "sf-20261109-r10q6-01",
+        "task_spec_revision": 1,
+        "attempt_id": "sf-20261109-r10q6-01-a01",
+        "dispatch_registry_revision": 3,
+        "worker_session_id": "host-worker-123",
+        "terminal_state": "completed",
+        "result_completeness": "complete",
+        "summary": "Created the schemas and verified fixture contracts.",
+        "artifacts": [
+          {
+            "artifact_id": "artifact-01",
+            "slot_id": "OUT-01",
+            "producer_task_id": "sf-20261109-r10q6-01",
+            "producer_attempt_id": "sf-20261109-r10q6-01-a01",
+            "locator": "docs/schemas/task-registry.schema.json",
+            "immutable_ref": null,
+            "byte_length": 512,
+            "content_digest": {
+              "algorithm": "sha-256",
+              "value": "bad"
+            },
+            "acceptance_criteria_ids": [
+              "AC-01"
+            ]
+          }
+        ],
+        "acceptance_evidence": [
+          {
+            "criterion_id": "AC-01",
+            "artifact_ids": [
+              "artifact-01"
+            ],
+            "evidence_ref": "commit:abc123",
+            "verification_command": "python3 scripts/validate.py"
+          }
+        ]
+      }
+    },
+    {
+      "name": "missing-dispatch-revision",
+      "document": {
+        "schema_version": 1,
+        "session_id": "sf-20261109-r10q6",
+        "task_id": "sf-20261109-r10q6-01",
+        "task_spec_revision": 1,
+        "attempt_id": "sf-20261109-r10q6-01-a01",
+        "worker_session_id": null,
+        "terminal_state": null,
+        "result_completeness": "complete",
+        "summary": "Created the schemas and verified fixture contracts.",
+        "artifacts": [],
+        "acceptance_evidence": [
+          {
+            "criterion_id": "AC-01",
+            "artifact_ids": [],
+            "evidence_ref": "commit:abc123",
+            "verification_command": "python3 scripts/validate.py"
+          }
+        ]
+      }
+    }
+  ]
+}

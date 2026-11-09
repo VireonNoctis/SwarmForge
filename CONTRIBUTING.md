@@ -19,11 +19,15 @@ Thanks for taking the time to improve this project.
 
 ## Baseline checks
 
-Run the repository's dependency-free validation:
+Install the maintainer-only JSON Schema validator, then run the package checks:
 
 ```bash
+python3 -m pip install -r requirements-dev.txt
 python3 scripts/validate.py
+python3 -m unittest discover -s tests -v
 ```
+
+These development dependencies are not required to install or use the portable Skill.
 
 Optional local hooks:
 
