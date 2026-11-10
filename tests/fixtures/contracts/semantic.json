@@ -1,8 +1,6 @@
 {
-  "valid": [
-    {
-      "name": "coordinator-owned-complete",
-      "kind": "result",
+  "bases": {
+    "coordinator": {
       "registry": {
         "schema_version": 1,
         "session_id": "sf-20261110-r11k3",
@@ -41,7 +39,7 @@
                 "actor": "coordinator",
                 "recorded_at": "2026-11-10T13:58:00Z",
                 "registry_revision": 2,
-                "reason": "Coordinator began the task",
+                "reason": "Coordinator began work",
                 "evidence_refs": []
               },
               {
@@ -87,7 +85,7 @@
                 ],
                 "recovery_decision": null,
                 "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Coordinator completed and verified the task"
+                "reason": "Coordinator verified completion"
               }
             ],
             "blocked_by": [],
@@ -117,9 +115,7 @@
         ]
       }
     },
-    {
-      "name": "worker-owned-complete",
-      "kind": "result",
+    "worker": {
       "registry": {
         "schema_version": 1,
         "session_id": "sf-20261110-r11k3",
@@ -170,7 +166,7 @@
                 "actor": "coordinator",
                 "recorded_at": "2026-11-10T14:00:00Z",
                 "registry_revision": 3,
-                "reason": "Coordinator verified the result",
+                "reason": "Coordinator verified result",
                 "evidence_refs": [
                   "evidence:sf-20261110-r11k3-02-a01:AC-01"
                 ]
@@ -179,7 +175,7 @@
             "acceptance_criteria": [
               {
                 "id": "AC-01",
-                "description": "The source change passes verification",
+                "description": "Source change passes verification",
                 "verification": "python3 -m unittest discover -s tests -v"
               }
             ],
@@ -221,7 +217,7 @@
                 ],
                 "recovery_decision": null,
                 "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
+                "reason": "Worker completed"
               }
             ],
             "blocked_by": [],
@@ -239,7 +235,7 @@
         "worker_session_id": "host-worker-02",
         "terminal_state": "completed",
         "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
+        "summary": "Worker returned a source artifact and acceptance evidence.",
         "artifacts": [
           {
             "artifact_id": "artifact-01",
@@ -270,9 +266,7 @@
         ]
       }
     },
-    {
-      "name": "completed-dependency-unlocks-ready-task",
-      "kind": "registry",
+    "dependency": {
       "registry": {
         "schema_version": 1,
         "session_id": "sf-20261110-r11k3",
@@ -311,7 +305,7 @@
                 "actor": "coordinator",
                 "recorded_at": "2026-11-10T13:58:00Z",
                 "registry_revision": 2,
-                "reason": "Coordinator began the task",
+                "reason": "Coordinator began work",
                 "evidence_refs": []
               },
               {
@@ -357,7 +351,7 @@
                 ],
                 "recovery_decision": null,
                 "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Coordinator completed and verified the task"
+                "reason": "Coordinator verified completion"
               }
             ],
             "blocked_by": [],
@@ -387,9 +381,9 @@
                 "from": null,
                 "to": "ready",
                 "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:01:00Z",
+                "recorded_at": "2026-11-10T13:57:00Z",
                 "registry_revision": 4,
-                "reason": "Dependency has verified completion",
+                "reason": "Ready for work",
                 "evidence_refs": []
               }
             ],
@@ -414,400 +408,12 @@
           }
         ]
       }
-    }
-  ],
-  "invalid": [
-    {
-      "name": "duplicate-task-id",
-      "kind": "registry",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-01",
-            "task_spec_revision": 1,
-            "owner": "coordinator",
-            "objective": "Verify a semantic task and result contract",
-            "context_refs": [
-              "SKILL.md",
-              "docs/ORCHESTRATION_PATTERNS.md"
-            ],
-            "read_paths": [
-              "docs/ORCHESTRATION_PATTERNS.md"
-            ],
-            "write_paths": [],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Coordinator began the task",
-                "evidence_refs": []
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "All criteria verified",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-01-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "Semantic validation succeeds",
-                "verification": "python3 scripts/validate.py"
-              }
-            ],
-            "expected_artifacts": [],
-            "verification_commands": [
-              "python3 scripts/validate.py"
-            ],
-            "deliverable": "Verified semantic contract",
-            "worker_session_id": null,
-            "worker_status": null,
-            "result_ref": "result:sf-20261110-r11k3-01-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-01-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": null,
-                "worker_status": null,
-                "terminal_state": null,
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-01-a01",
-                "artifact_refs": [],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-01-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Coordinator completed and verified the task"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          },
-          {
-            "id": "sf-20261110-r11k3-01",
-            "task_spec_revision": 1,
-            "owner": "coordinator",
-            "objective": "Verify a semantic task and result contract",
-            "context_refs": [
-              "SKILL.md",
-              "docs/ORCHESTRATION_PATTERNS.md"
-            ],
-            "read_paths": [
-              "docs/ORCHESTRATION_PATTERNS.md"
-            ],
-            "write_paths": [],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Coordinator began the task",
-                "evidence_refs": []
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "All criteria verified",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-01-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "Semantic validation succeeds",
-                "verification": "python3 scripts/validate.py"
-              }
-            ],
-            "expected_artifacts": [],
-            "verification_commands": [
-              "python3 scripts/validate.py"
-            ],
-            "deliverable": "Verified semantic contract",
-            "worker_session_id": null,
-            "worker_status": null,
-            "result_ref": "result:sf-20261110-r11k3-01-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-01-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": null,
-                "worker_status": null,
-                "terminal_state": null,
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-01-a01",
-                "artifact_refs": [],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-01-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Coordinator completed and verified the task"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "expected_errors": [
-        "REGISTRY_DUPLICATE_TASK_ID"
-      ]
     },
-    {
-      "name": "missing-dependency",
-      "kind": "registry",
+    "cycle": {
       "registry": {
         "schema_version": 1,
         "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-01",
-            "task_spec_revision": 1,
-            "owner": "coordinator",
-            "objective": "Verify a semantic task and result contract",
-            "context_refs": [
-              "SKILL.md",
-              "docs/ORCHESTRATION_PATTERNS.md"
-            ],
-            "read_paths": [
-              "docs/ORCHESTRATION_PATTERNS.md"
-            ],
-            "write_paths": [],
-            "depends_on": [
-              "missing-task"
-            ],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Coordinator began the task",
-                "evidence_refs": []
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "All criteria verified",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-01-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "Semantic validation succeeds",
-                "verification": "python3 scripts/validate.py"
-              }
-            ],
-            "expected_artifacts": [],
-            "verification_commands": [
-              "python3 scripts/validate.py"
-            ],
-            "deliverable": "Verified semantic contract",
-            "worker_session_id": null,
-            "worker_status": null,
-            "result_ref": "result:sf-20261110-r11k3-01-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-01-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": null,
-                "worker_status": null,
-                "terminal_state": null,
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-01-a01",
-                "artifact_refs": [],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-01-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Coordinator completed and verified the task"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "expected_errors": [
-        "REGISTRY_DEPENDENCY_MISSING"
-      ]
-    },
-    {
-      "name": "self-dependency",
-      "kind": "registry",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-01",
-            "task_spec_revision": 1,
-            "owner": "coordinator",
-            "objective": "Verify a semantic task and result contract",
-            "context_refs": [
-              "SKILL.md",
-              "docs/ORCHESTRATION_PATTERNS.md"
-            ],
-            "read_paths": [
-              "docs/ORCHESTRATION_PATTERNS.md"
-            ],
-            "write_paths": [],
-            "depends_on": [
-              "sf-20261110-r11k3-01"
-            ],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Coordinator began the task",
-                "evidence_refs": []
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "All criteria verified",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-01-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "Semantic validation succeeds",
-                "verification": "python3 scripts/validate.py"
-              }
-            ],
-            "expected_artifacts": [],
-            "verification_commands": [
-              "python3 scripts/validate.py"
-            ],
-            "deliverable": "Verified semantic contract",
-            "worker_session_id": null,
-            "worker_status": null,
-            "result_ref": "result:sf-20261110-r11k3-01-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-01-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": null,
-                "worker_status": null,
-                "terminal_state": null,
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-01-a01",
-                "artifact_refs": [],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-01-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Coordinator completed and verified the task"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "expected_errors": [
-        "REGISTRY_SELF_DEPENDENCY"
-      ]
-    },
-    {
-      "name": "dependency-cycle",
-      "kind": "registry",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
+        "registry_revision": 1,
         "objective": "Exercise semantic task/result validation",
         "requested_worker_cap": 2,
         "tasks": [
@@ -835,7 +441,7 @@
                 "actor": "coordinator",
                 "recorded_at": "2026-11-10T13:57:00Z",
                 "registry_revision": 1,
-                "reason": "Waiting on the other task",
+                "reason": "Ready for work",
                 "evidence_refs": []
               }
             ],
@@ -884,7 +490,7 @@
                 "actor": "coordinator",
                 "recorded_at": "2026-11-10T13:57:00Z",
                 "registry_revision": 1,
-                "reason": "Waiting on the other task",
+                "reason": "Ready for work",
                 "evidence_refs": []
               }
             ],
@@ -910,14 +516,9 @@
             "recovery_decision": null
           }
         ]
-      },
-      "expected_errors": [
-        "REGISTRY_DEPENDENCY_CYCLE"
-      ]
+      }
     },
-    {
-      "name": "illegal-state-transition",
-      "kind": "registry",
+    "duplicateTask": {
       "registry": {
         "schema_version": 1,
         "session_id": "sf-20261110-r11k3",
@@ -956,106 +557,7 @@
                 "actor": "coordinator",
                 "recorded_at": "2026-11-10T13:58:00Z",
                 "registry_revision": 2,
-                "reason": "Coordinator began the task",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "All criteria verified",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-01-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "Semantic validation succeeds",
-                "verification": "python3 scripts/validate.py"
-              }
-            ],
-            "expected_artifacts": [],
-            "verification_commands": [
-              "python3 scripts/validate.py"
-            ],
-            "deliverable": "Verified semantic contract",
-            "worker_session_id": null,
-            "worker_status": null,
-            "result_ref": "result:sf-20261110-r11k3-01-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-01-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": null,
-                "worker_status": null,
-                "terminal_state": null,
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-01-a01",
-                "artifact_refs": [],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-01-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Coordinator completed and verified the task"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "expected_errors": [
-        "REGISTRY_INVALID_TRANSITION"
-      ]
-    },
-    {
-      "name": "status-history-mismatch",
-      "kind": "registry",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-01",
-            "task_spec_revision": 1,
-            "owner": "coordinator",
-            "objective": "Verify a semantic task and result contract",
-            "context_refs": [
-              "SKILL.md",
-              "docs/ORCHESTRATION_PATTERNS.md"
-            ],
-            "read_paths": [
-              "docs/ORCHESTRATION_PATTERNS.md"
-            ],
-            "write_paths": [],
-            "depends_on": [],
-            "status": "failed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Coordinator began the task",
+                "reason": "Coordinator began work",
                 "evidence_refs": []
               },
               {
@@ -1101,21 +603,99 @@
                 ],
                 "recovery_decision": null,
                 "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Coordinator completed and verified the task"
+                "reason": "Coordinator verified completion"
+              }
+            ],
+            "blocked_by": [],
+            "recovery_decision": null
+          },
+          {
+            "id": "sf-20261110-r11k3-01",
+            "task_spec_revision": 1,
+            "owner": "coordinator",
+            "objective": "Verify a semantic task and result contract",
+            "context_refs": [
+              "SKILL.md",
+              "docs/ORCHESTRATION_PATTERNS.md"
+            ],
+            "read_paths": [
+              "docs/ORCHESTRATION_PATTERNS.md"
+            ],
+            "write_paths": [],
+            "depends_on": [],
+            "status": "completed",
+            "state_history": [
+              {
+                "from": null,
+                "to": "ready",
+                "actor": "coordinator",
+                "recorded_at": "2026-11-10T13:57:00Z",
+                "registry_revision": 1,
+                "reason": "No dependencies",
+                "evidence_refs": []
+              },
+              {
+                "from": "ready",
+                "to": "active",
+                "actor": "coordinator",
+                "recorded_at": "2026-11-10T13:58:00Z",
+                "registry_revision": 2,
+                "reason": "Coordinator began work",
+                "evidence_refs": []
+              },
+              {
+                "from": "active",
+                "to": "completed",
+                "actor": "coordinator",
+                "recorded_at": "2026-11-10T14:00:00Z",
+                "registry_revision": 3,
+                "reason": "All criteria verified",
+                "evidence_refs": [
+                  "evidence:sf-20261110-r11k3-01-a01:AC-01"
+                ]
+              }
+            ],
+            "acceptance_criteria": [
+              {
+                "id": "AC-01",
+                "description": "Semantic validation succeeds",
+                "verification": "python3 scripts/validate.py"
+              }
+            ],
+            "expected_artifacts": [],
+            "verification_commands": [
+              "python3 scripts/validate.py"
+            ],
+            "deliverable": "Verified semantic contract",
+            "worker_session_id": null,
+            "worker_status": null,
+            "result_ref": "result:sf-20261110-r11k3-01-a01",
+            "attempts": [
+              {
+                "attempt_id": "sf-20261110-r11k3-01-a01",
+                "previous_attempt_id": null,
+                "dispatch_registry_revision": 2,
+                "worker_session_id": null,
+                "worker_status": null,
+                "terminal_state": null,
+                "result_completeness": "complete",
+                "result_ref": "result:sf-20261110-r11k3-01-a01",
+                "artifact_refs": [],
+                "acceptance_evidence_refs": [
+                  "evidence:sf-20261110-r11k3-01-a01:AC-01"
+                ],
+                "recovery_decision": null,
+                "recorded_at": "2026-11-10T14:00:00Z",
+                "reason": "Coordinator verified completion"
               }
             ],
             "blocked_by": [],
             "recovery_decision": null
           }
         ]
-      },
-      "expected_errors": [
-        "REGISTRY_STATUS_HISTORY_MISMATCH"
-      ]
+      }
     },
-    {
-      "name": "duplicate-attempt-id",
-      "kind": "registry",
+    "duplicateAttempt": {
       "registry": {
         "schema_version": 1,
         "session_id": "sf-20261110-r11k3",
@@ -1154,7 +734,7 @@
                 "actor": "coordinator",
                 "recorded_at": "2026-11-10T13:58:00Z",
                 "registry_revision": 2,
-                "reason": "Coordinator began the task",
+                "reason": "Coordinator began work",
                 "evidence_refs": []
               },
               {
@@ -1200,7 +780,7 @@
                 ],
                 "recovery_decision": null,
                 "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Coordinator completed and verified the task"
+                "reason": "Coordinator verified completion"
               }
             ],
             "blocked_by": [],
@@ -1226,9 +806,9 @@
                 "from": null,
                 "to": "ready",
                 "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:01:00Z",
+                "recorded_at": "2026-11-10T13:57:00Z",
                 "registry_revision": 4,
-                "reason": "Ready task",
+                "reason": "Ready for work",
                 "evidence_refs": []
               }
             ],
@@ -1251,7 +831,7 @@
               {
                 "attempt_id": "sf-20261110-r11k3-01-a01",
                 "previous_attempt_id": null,
-                "dispatch_registry_revision": 3,
+                "dispatch_registry_revision": 4,
                 "worker_session_id": null,
                 "worker_status": null,
                 "terminal_state": null,
@@ -1261,21 +841,16 @@
                 "acceptance_evidence_refs": [],
                 "recovery_decision": null,
                 "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Coordinator completed and verified the task"
+                "reason": "Coordinator verified completion"
               }
             ],
             "blocked_by": [],
             "recovery_decision": null
           }
         ]
-      },
-      "expected_errors": [
-        "REGISTRY_DUPLICATE_ATTEMPT_ID"
-      ]
+      }
     },
-    {
-      "name": "cross-task-attempt-lineage",
-      "kind": "registry",
+    "crossLineage": {
       "registry": {
         "schema_version": 1,
         "session_id": "sf-20261110-r11k3",
@@ -1305,7 +880,7 @@
                 "actor": "coordinator",
                 "recorded_at": "2026-11-10T13:57:00Z",
                 "registry_revision": 1,
-                "reason": "Ready",
+                "reason": "Ready for work",
                 "evidence_refs": []
               }
             ],
@@ -1360,9 +935,9 @@
                 "from": null,
                 "to": "ready",
                 "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
+                "recorded_at": "2026-11-10T13:57:00Z",
                 "registry_revision": 2,
-                "reason": "Ready",
+                "reason": "Ready for work",
                 "evidence_refs": []
               }
             ],
@@ -1399,14 +974,9 @@
             "recovery_decision": null
           }
         ]
-      },
-      "expected_errors": [
-        "REGISTRY_ATTEMPT_PREVIOUS_CROSS_TASK"
-      ]
+      }
     },
-    {
-      "name": "multiple-unresolved-attempts",
-      "kind": "registry",
+    "unresolved": {
       "registry": {
         "schema_version": 1,
         "session_id": "sf-20261110-r11k3",
@@ -1466,7 +1036,7 @@
             "acceptance_criteria": [
               {
                 "id": "AC-01",
-                "description": "The source change passes verification",
+                "description": "Source change passes verification",
                 "verification": "python3 -m unittest discover -s tests -v"
               }
             ],
@@ -1504,7 +1074,7 @@
                 "acceptance_evidence_refs": [],
                 "recovery_decision": null,
                 "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
+                "reason": "Worker completed"
               },
               {
                 "attempt_id": "unresolved-a02",
@@ -1519,122 +1089,16 @@
                 "acceptance_evidence_refs": [],
                 "recovery_decision": null,
                 "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
+                "reason": "Worker completed"
               }
             ],
             "blocked_by": [],
             "recovery_decision": null
           }
         ]
-      },
-      "expected_errors": [
-        "REGISTRY_MULTIPLE_UNRESOLVED_ATTEMPTS"
-      ]
+      }
     },
-    {
-      "name": "stale-blocked-by",
-      "kind": "registry",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-01",
-            "task_spec_revision": 1,
-            "owner": "coordinator",
-            "objective": "Verify a semantic task and result contract",
-            "context_refs": [
-              "SKILL.md",
-              "docs/ORCHESTRATION_PATTERNS.md"
-            ],
-            "read_paths": [
-              "docs/ORCHESTRATION_PATTERNS.md"
-            ],
-            "write_paths": [],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Coordinator began the task",
-                "evidence_refs": []
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "All criteria verified",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-01-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "Semantic validation succeeds",
-                "verification": "python3 scripts/validate.py"
-              }
-            ],
-            "expected_artifacts": [],
-            "verification_commands": [
-              "python3 scripts/validate.py"
-            ],
-            "deliverable": "Verified semantic contract",
-            "worker_session_id": null,
-            "worker_status": null,
-            "result_ref": "result:sf-20261110-r11k3-01-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-01-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": null,
-                "worker_status": null,
-                "terminal_state": null,
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-01-a01",
-                "artifact_refs": [],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-01-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Coordinator completed and verified the task"
-              }
-            ],
-            "blocked_by": [
-              "stale-blocker"
-            ],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "expected_errors": [
-        "REGISTRY_BLOCKED_BY_MISMATCH"
-      ]
-    },
-    {
-      "name": "overlapping-ready-writes",
-      "kind": "registry",
+    "overlap": {
       "registry": {
         "schema_version": 1,
         "session_id": "sf-20261110-r11k3",
@@ -1666,7 +1130,7 @@
                 "actor": "coordinator",
                 "recorded_at": "2026-11-10T13:57:00Z",
                 "registry_revision": 1,
-                "reason": "Ready",
+                "reason": "Ready for work",
                 "evidence_refs": []
               }
             ],
@@ -1711,9 +1175,9 @@
                 "from": null,
                 "to": "ready",
                 "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
+                "recorded_at": "2026-11-10T13:57:00Z",
                 "registry_revision": 2,
-                "reason": "Ready",
+                "reason": "Ready for work",
                 "evidence_refs": []
               }
             ],
@@ -1737,2505 +1201,9 @@
             "recovery_decision": null
           }
         ]
-      },
-      "expected_errors": [
-        "REGISTRY_WRITE_PATH_OVERLAP"
-      ]
+      }
     },
-    {
-      "name": "result-session-mismatch",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "another-session",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 1,
-        "attempt_id": "sf-20261110-r11k3-02-a01",
-        "dispatch_registry_revision": 2,
-        "worker_session_id": "host-worker-02",
-        "terminal_state": "completed",
-        "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [
-          {
-            "artifact_id": "artifact-01",
-            "slot_id": "OUT-01",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "sf-20261110-r11k3-02-a01",
-            "locator": "src/main.py",
-            "immutable_ref": null,
-            "byte_length": 128,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            },
-            "acceptance_criteria_ids": [
-              "AC-01"
-            ]
-          }
-        ],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-01",
-            "artifact_ids": [
-              "artifact-01"
-            ],
-            "evidence_ref": "evidence:sf-20261110-r11k3-02-a01:AC-01",
-            "verification_command": "python3 -m unittest discover -s tests -v"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_SESSION_MISMATCH"
-      ]
-    },
-    {
-      "name": "stale-task-specification",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 2,
-        "attempt_id": "sf-20261110-r11k3-02-a01",
-        "dispatch_registry_revision": 2,
-        "worker_session_id": "host-worker-02",
-        "terminal_state": "completed",
-        "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [
-          {
-            "artifact_id": "artifact-01",
-            "slot_id": "OUT-01",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "sf-20261110-r11k3-02-a01",
-            "locator": "src/main.py",
-            "immutable_ref": null,
-            "byte_length": 128,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            },
-            "acceptance_criteria_ids": [
-              "AC-01"
-            ]
-          }
-        ],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-01",
-            "artifact_ids": [
-              "artifact-01"
-            ],
-            "evidence_ref": "evidence:sf-20261110-r11k3-02-a01:AC-01",
-            "verification_command": "python3 -m unittest discover -s tests -v"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_TASK_REVISION_MISMATCH"
-      ]
-    },
-    {
-      "name": "unknown-attempt",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 1,
-        "attempt_id": "missing-attempt",
-        "dispatch_registry_revision": 2,
-        "worker_session_id": "host-worker-02",
-        "terminal_state": "completed",
-        "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [
-          {
-            "artifact_id": "artifact-01",
-            "slot_id": "OUT-01",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "sf-20261110-r11k3-02-a01",
-            "locator": "src/main.py",
-            "immutable_ref": null,
-            "byte_length": 128,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            },
-            "acceptance_criteria_ids": [
-              "AC-01"
-            ]
-          }
-        ],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-01",
-            "artifact_ids": [
-              "artifact-01"
-            ],
-            "evidence_ref": "evidence:sf-20261110-r11k3-02-a01:AC-01",
-            "verification_command": "python3 -m unittest discover -s tests -v"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_ATTEMPT_UNKNOWN"
-      ]
-    },
-    {
-      "name": "dispatch-revision-mismatch",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 1,
-        "attempt_id": "sf-20261110-r11k3-02-a01",
-        "dispatch_registry_revision": 1,
-        "worker_session_id": "host-worker-02",
-        "terminal_state": "completed",
-        "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [
-          {
-            "artifact_id": "artifact-01",
-            "slot_id": "OUT-01",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "sf-20261110-r11k3-02-a01",
-            "locator": "src/main.py",
-            "immutable_ref": null,
-            "byte_length": 128,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            },
-            "acceptance_criteria_ids": [
-              "AC-01"
-            ]
-          }
-        ],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-01",
-            "artifact_ids": [
-              "artifact-01"
-            ],
-            "evidence_ref": "evidence:sf-20261110-r11k3-02-a01:AC-01",
-            "verification_command": "python3 -m unittest discover -s tests -v"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_DISPATCH_REVISION_MISMATCH"
-      ]
-    },
-    {
-      "name": "worker-session-mismatch",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 1,
-        "attempt_id": "sf-20261110-r11k3-02-a01",
-        "dispatch_registry_revision": 2,
-        "worker_session_id": "host-worker-other",
-        "terminal_state": "completed",
-        "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [
-          {
-            "artifact_id": "artifact-01",
-            "slot_id": "OUT-01",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "sf-20261110-r11k3-02-a01",
-            "locator": "src/main.py",
-            "immutable_ref": null,
-            "byte_length": 128,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            },
-            "acceptance_criteria_ids": [
-              "AC-01"
-            ]
-          }
-        ],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-01",
-            "artifact_ids": [
-              "artifact-01"
-            ],
-            "evidence_ref": "evidence:sf-20261110-r11k3-02-a01:AC-01",
-            "verification_command": "python3 -m unittest discover -s tests -v"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_WORKER_SESSION_MISMATCH"
-      ]
-    },
-    {
-      "name": "terminal-state-mismatch",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 1,
-        "attempt_id": "sf-20261110-r11k3-02-a01",
-        "dispatch_registry_revision": 2,
-        "worker_session_id": "host-worker-02",
-        "terminal_state": "failed",
-        "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [
-          {
-            "artifact_id": "artifact-01",
-            "slot_id": "OUT-01",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "sf-20261110-r11k3-02-a01",
-            "locator": "src/main.py",
-            "immutable_ref": null,
-            "byte_length": 128,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            },
-            "acceptance_criteria_ids": [
-              "AC-01"
-            ]
-          }
-        ],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-01",
-            "artifact_ids": [
-              "artifact-01"
-            ],
-            "evidence_ref": "evidence:sf-20261110-r11k3-02-a01:AC-01",
-            "verification_command": "python3 -m unittest discover -s tests -v"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_TERMINAL_STATE_MISMATCH"
-      ]
-    },
-    {
-      "name": "result-completeness-mismatch",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 1,
-        "attempt_id": "sf-20261110-r11k3-02-a01",
-        "dispatch_registry_revision": 2,
-        "worker_session_id": "host-worker-02",
-        "terminal_state": "completed",
-        "result_completeness": "partial",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [
-          {
-            "artifact_id": "artifact-01",
-            "slot_id": "OUT-01",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "sf-20261110-r11k3-02-a01",
-            "locator": "src/main.py",
-            "immutable_ref": null,
-            "byte_length": 128,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            },
-            "acceptance_criteria_ids": [
-              "AC-01"
-            ]
-          }
-        ],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-01",
-            "artifact_ids": [
-              "artifact-01"
-            ],
-            "evidence_ref": "evidence:sf-20261110-r11k3-02-a01:AC-01",
-            "verification_command": "python3 -m unittest discover -s tests -v"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_COMPLETENESS_MISMATCH"
-      ]
-    },
-    {
-      "name": "unexpected-artifact-slot",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 1,
-        "attempt_id": "sf-20261110-r11k3-02-a01",
-        "dispatch_registry_revision": 2,
-        "worker_session_id": "host-worker-02",
-        "terminal_state": "completed",
-        "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [
-          {
-            "artifact_id": "artifact-01",
-            "slot_id": "UNDECLARED",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "sf-20261110-r11k3-02-a01",
-            "locator": "src/main.py",
-            "immutable_ref": null,
-            "byte_length": 128,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            },
-            "acceptance_criteria_ids": [
-              "AC-01"
-            ]
-          }
-        ],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-01",
-            "artifact_ids": [
-              "artifact-01"
-            ],
-            "evidence_ref": "evidence:sf-20261110-r11k3-02-a01:AC-01",
-            "verification_command": "python3 -m unittest discover -s tests -v"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_ARTIFACT_SLOT_UNKNOWN"
-      ]
-    },
-    {
-      "name": "duplicate-slot-claim",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 1,
-        "attempt_id": "sf-20261110-r11k3-02-a01",
-        "dispatch_registry_revision": 2,
-        "worker_session_id": "host-worker-02",
-        "terminal_state": "completed",
-        "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [
-          {
-            "artifact_id": "artifact-01",
-            "slot_id": "OUT-01",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "sf-20261110-r11k3-02-a01",
-            "locator": "src/main.py",
-            "immutable_ref": null,
-            "byte_length": 128,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            },
-            "acceptance_criteria_ids": [
-              "AC-01"
-            ]
-          },
-          {
-            "artifact_id": "artifact-02",
-            "slot_id": "OUT-01",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "sf-20261110-r11k3-02-a01",
-            "locator": "src/main.py",
-            "immutable_ref": null,
-            "byte_length": 128,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            },
-            "acceptance_criteria_ids": [
-              "AC-01"
-            ]
-          }
-        ],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-01",
-            "artifact_ids": [
-              "artifact-01"
-            ],
-            "evidence_ref": "evidence:sf-20261110-r11k3-02-a01:AC-01",
-            "verification_command": "python3 -m unittest discover -s tests -v"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_DUPLICATE_SLOT_CLAIM"
-      ]
-    },
-    {
-      "name": "artifact-producer-mismatch",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 1,
-        "attempt_id": "sf-20261110-r11k3-02-a01",
-        "dispatch_registry_revision": 2,
-        "worker_session_id": "host-worker-02",
-        "terminal_state": "completed",
-        "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [
-          {
-            "artifact_id": "artifact-01",
-            "slot_id": "OUT-01",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "another-attempt",
-            "locator": "src/main.py",
-            "immutable_ref": null,
-            "byte_length": 128,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            },
-            "acceptance_criteria_ids": [
-              "AC-01"
-            ]
-          }
-        ],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-01",
-            "artifact_ids": [
-              "artifact-01"
-            ],
-            "evidence_ref": "evidence:sf-20261110-r11k3-02-a01:AC-01",
-            "verification_command": "python3 -m unittest discover -s tests -v"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_ARTIFACT_PRODUCER_MISMATCH"
-      ]
-    },
-    {
-      "name": "missing-required-artifact",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 1,
-        "attempt_id": "sf-20261110-r11k3-02-a01",
-        "dispatch_registry_revision": 2,
-        "worker_session_id": "host-worker-02",
-        "terminal_state": "completed",
-        "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-01",
-            "artifact_ids": [],
-            "evidence_ref": "evidence:sf-20261110-r11k3-02-a01:AC-01",
-            "verification_command": "python3 -m unittest discover -s tests -v"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_REQUIRED_ARTIFACT_MISSING"
-      ]
-    },
-    {
-      "name": "missing-criterion-evidence",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 1,
-        "attempt_id": "sf-20261110-r11k3-02-a01",
-        "dispatch_registry_revision": 2,
-        "worker_session_id": "host-worker-02",
-        "terminal_state": "completed",
-        "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [
-          {
-            "artifact_id": "artifact-01",
-            "slot_id": "OUT-01",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "sf-20261110-r11k3-02-a01",
-            "locator": "src/main.py",
-            "immutable_ref": null,
-            "byte_length": 128,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            },
-            "acceptance_criteria_ids": [
-              "AC-01"
-            ]
-          }
-        ],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-OTHER",
-            "artifact_ids": [],
-            "evidence_ref": "evidence:other",
-            "verification_command": "inspect"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_CRITERION_EVIDENCE_MISSING"
-      ]
-    },
-    {
-      "name": "unknown-evidence-artifact",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 1,
-        "attempt_id": "sf-20261110-r11k3-02-a01",
-        "dispatch_registry_revision": 2,
-        "worker_session_id": "host-worker-02",
-        "terminal_state": "completed",
-        "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [
-          {
-            "artifact_id": "artifact-01",
-            "slot_id": "OUT-01",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "sf-20261110-r11k3-02-a01",
-            "locator": "src/main.py",
-            "immutable_ref": null,
-            "byte_length": 128,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            },
-            "acceptance_criteria_ids": [
-              "AC-01"
-            ]
-          }
-        ],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-01",
-            "artifact_ids": [
-              "ghost-artifact"
-            ],
-            "evidence_ref": "evidence:sf-20261110-r11k3-02-a01:AC-01",
-            "verification_command": "python3 -m unittest discover -s tests -v"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_EVIDENCE_ARTIFACT_UNKNOWN"
-      ]
-    },
-    {
-      "name": "artifact-integrity-missing",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 1,
-        "attempt_id": "sf-20261110-r11k3-02-a01",
-        "dispatch_registry_revision": 2,
-        "worker_session_id": "host-worker-02",
-        "terminal_state": "completed",
-        "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [
-          {
-            "artifact_id": "artifact-01",
-            "slot_id": "OUT-01",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "sf-20261110-r11k3-02-a01",
-            "locator": "src/main.py",
-            "immutable_ref": null,
-            "byte_length": null,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": null
-            },
-            "acceptance_criteria_ids": [
-              "AC-01"
-            ]
-          }
-        ],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-01",
-            "artifact_ids": [
-              "artifact-01"
-            ],
-            "evidence_ref": "evidence:sf-20261110-r11k3-02-a01:AC-01",
-            "verification_command": "python3 -m unittest discover -s tests -v"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_ARTIFACT_INTEGRITY_MISSING"
-      ]
-    },
-    {
-      "name": "artifact-path-escape",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 1,
-        "attempt_id": "sf-20261110-r11k3-02-a01",
-        "dispatch_registry_revision": 2,
-        "worker_session_id": "host-worker-02",
-        "terminal_state": "completed",
-        "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [
-          {
-            "artifact_id": "artifact-01",
-            "slot_id": "OUT-01",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "sf-20261110-r11k3-02-a01",
-            "locator": "../outside.py",
-            "immutable_ref": null,
-            "byte_length": 128,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            },
-            "acceptance_criteria_ids": [
-              "AC-01"
-            ]
-          }
-        ],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-01",
-            "artifact_ids": [
-              "artifact-01"
-            ],
-            "evidence_ref": "evidence:sf-20261110-r11k3-02-a01:AC-01",
-            "verification_command": "python3 -m unittest discover -s tests -v"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_ARTIFACT_PATH_OUT_OF_SCOPE"
-      ]
-    },
-    {
-      "name": "artifact-criterion-mismatch",
-      "kind": "result",
-      "registry": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "registry_revision": 3,
-        "objective": "Exercise semantic task/result validation",
-        "requested_worker_cap": 2,
-        "tasks": [
-          {
-            "id": "sf-20261110-r11k3-02",
-            "task_spec_revision": 1,
-            "owner": "host-worker-02",
-            "objective": "Implement a bounded source change",
-            "context_refs": [
-              "SKILL.md"
-            ],
-            "read_paths": [
-              "src/"
-            ],
-            "write_paths": [
-              "src/main.py"
-            ],
-            "depends_on": [],
-            "status": "completed",
-            "state_history": [
-              {
-                "from": null,
-                "to": "ready",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:57:00Z",
-                "registry_revision": 1,
-                "reason": "No dependencies",
-                "evidence_refs": []
-              },
-              {
-                "from": "ready",
-                "to": "active",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T13:58:00Z",
-                "registry_revision": 2,
-                "reason": "Host confirmed worker active",
-                "evidence_refs": [
-                  "host-event:active"
-                ]
-              },
-              {
-                "from": "active",
-                "to": "completed",
-                "actor": "coordinator",
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "registry_revision": 3,
-                "reason": "Coordinator verified the result",
-                "evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ]
-              }
-            ],
-            "acceptance_criteria": [
-              {
-                "id": "AC-01",
-                "description": "The source change passes verification",
-                "verification": "python3 -m unittest discover -s tests -v"
-              }
-            ],
-            "expected_artifacts": [
-              {
-                "slot_id": "OUT-01",
-                "kind": "source_file",
-                "required": true,
-                "allowed_paths": [
-                  "src/"
-                ],
-                "satisfies": [
-                  "AC-01"
-                ]
-              }
-            ],
-            "verification_commands": [
-              "python3 -m unittest discover -s tests -v"
-            ],
-            "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-02",
-            "worker_status": "completed",
-            "result_ref": "result:sf-20261110-r11k3-02-a01",
-            "attempts": [
-              {
-                "attempt_id": "sf-20261110-r11k3-02-a01",
-                "previous_attempt_id": null,
-                "dispatch_registry_revision": 2,
-                "worker_session_id": "host-worker-02",
-                "worker_status": "completed",
-                "terminal_state": "completed",
-                "result_completeness": "complete",
-                "result_ref": "result:sf-20261110-r11k3-02-a01",
-                "artifact_refs": [
-                  "artifact-01"
-                ],
-                "acceptance_evidence_refs": [
-                  "evidence:sf-20261110-r11k3-02-a01:AC-01"
-                ],
-                "recovery_decision": null,
-                "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
-              }
-            ],
-            "blocked_by": [],
-            "recovery_decision": null
-          }
-        ]
-      },
-      "result": {
-        "schema_version": 1,
-        "session_id": "sf-20261110-r11k3",
-        "task_id": "sf-20261110-r11k3-02",
-        "task_spec_revision": 1,
-        "attempt_id": "sf-20261110-r11k3-02-a01",
-        "dispatch_registry_revision": 2,
-        "worker_session_id": "host-worker-02",
-        "terminal_state": "completed",
-        "result_completeness": "complete",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
-        "artifacts": [
-          {
-            "artifact_id": "artifact-01",
-            "slot_id": "OUT-01",
-            "producer_task_id": "sf-20261110-r11k3-02",
-            "producer_attempt_id": "sf-20261110-r11k3-02-a01",
-            "locator": "src/main.py",
-            "immutable_ref": null,
-            "byte_length": 128,
-            "content_digest": {
-              "algorithm": "sha-256",
-              "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            },
-            "acceptance_criteria_ids": [
-              "AC-OTHER"
-            ]
-          }
-        ],
-        "acceptance_evidence": [
-          {
-            "criterion_id": "AC-01",
-            "artifact_ids": [
-              "artifact-01"
-            ],
-            "evidence_ref": "evidence:sf-20261110-r11k3-02-a01:AC-01",
-            "verification_command": "python3 -m unittest discover -s tests -v"
-          }
-        ]
-      },
-      "expected_errors": [
-        "RESULT_ARTIFACT_CRITERIA_MISMATCH"
-      ]
-    },
-    {
-      "name": "superseded-attempt-result",
-      "kind": "result",
+    "superseded": {
       "registry": {
         "schema_version": 1,
         "session_id": "sf-20261110-r11k3",
@@ -4295,7 +1263,7 @@
             "acceptance_criteria": [
               {
                 "id": "AC-01",
-                "description": "The source change passes verification",
+                "description": "Source change passes verification",
                 "verification": "python3 -m unittest discover -s tests -v"
               }
             ],
@@ -4333,7 +1301,7 @@
                 "acceptance_evidence_refs": [],
                 "recovery_decision": null,
                 "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
+                "reason": "Worker completed"
               },
               {
                 "attempt_id": "latest-attempt",
@@ -4348,7 +1316,7 @@
                 "acceptance_evidence_refs": [],
                 "recovery_decision": null,
                 "recorded_at": "2026-11-10T14:00:00Z",
-                "reason": "Worker completed and returned a result"
+                "reason": "Worker completed"
               }
             ],
             "blocked_by": [],
@@ -4366,7 +1334,7 @@
         "worker_session_id": "host-worker-old",
         "terminal_state": "failed",
         "result_completeness": "partial",
-        "summary": "The worker returned a source artifact and acceptance evidence.",
+        "summary": "Worker returned a source artifact and acceptance evidence.",
         "artifacts": [],
         "acceptance_evidence": [
           {
@@ -4376,7 +1344,540 @@
             "verification_command": "inspect"
           }
         ]
-      },
+      }
+    }
+  },
+  "valid": [
+    {
+      "name": "coordinator-owned-complete",
+      "kind": "result",
+      "base": "coordinator"
+    },
+    {
+      "name": "worker-owned-complete",
+      "kind": "result",
+      "base": "worker"
+    },
+    {
+      "name": "completed-dependency-unlocks-ready-task",
+      "kind": "registry",
+      "base": "dependency"
+    }
+  ],
+  "invalid": [
+    {
+      "name": "duplicate-task-id",
+      "kind": "registry",
+      "base": "duplicateTask",
+      "expected_errors": [
+        "REGISTRY_DUPLICATE_TASK_ID"
+      ]
+    },
+    {
+      "name": "missing-dependency",
+      "kind": "registry",
+      "base": "coordinator",
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "depends_on"
+          ],
+          "value": [
+            "missing-task"
+          ]
+        }
+      ],
+      "expected_errors": [
+        "REGISTRY_DEPENDENCY_MISSING"
+      ]
+    },
+    {
+      "name": "self-dependency",
+      "kind": "registry",
+      "base": "coordinator",
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "depends_on"
+          ],
+          "value": [
+            "sf-20261110-r11k3-01"
+          ]
+        }
+      ],
+      "expected_errors": [
+        "REGISTRY_SELF_DEPENDENCY"
+      ]
+    },
+    {
+      "name": "dependency-cycle",
+      "kind": "registry",
+      "base": "cycle",
+      "expected_errors": [
+        "REGISTRY_DEPENDENCY_CYCLE"
+      ]
+    },
+    {
+      "name": "illegal-state-transition",
+      "kind": "registry",
+      "base": "coordinator",
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "state_history",
+            2,
+            "from"
+          ],
+          "value": "ready"
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "state_history",
+            2,
+            "to"
+          ],
+          "value": "completed"
+        }
+      ],
+      "expected_errors": [
+        "REGISTRY_INVALID_TRANSITION"
+      ]
+    },
+    {
+      "name": "status-history-mismatch",
+      "kind": "registry",
+      "base": "coordinator",
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "status"
+          ],
+          "value": "failed"
+        }
+      ],
+      "expected_errors": [
+        "REGISTRY_STATUS_HISTORY_MISMATCH"
+      ]
+    },
+    {
+      "name": "duplicate-attempt-id",
+      "kind": "registry",
+      "base": "duplicateAttempt",
+      "expected_errors": [
+        "REGISTRY_DUPLICATE_ATTEMPT_ID"
+      ]
+    },
+    {
+      "name": "cross-task-attempt-lineage",
+      "kind": "registry",
+      "base": "crossLineage",
+      "expected_errors": [
+        "REGISTRY_ATTEMPT_PREVIOUS_CROSS_TASK"
+      ]
+    },
+    {
+      "name": "multiple-unresolved-attempts",
+      "kind": "registry",
+      "base": "unresolved",
+      "expected_errors": [
+        "REGISTRY_MULTIPLE_UNRESOLVED_ATTEMPTS"
+      ]
+    },
+    {
+      "name": "stale-blocked-by",
+      "kind": "registry",
+      "base": "coordinator",
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "blocked_by"
+          ],
+          "value": [
+            "stale-blocker"
+          ]
+        }
+      ],
+      "expected_errors": [
+        "REGISTRY_BLOCKED_BY_MISMATCH"
+      ]
+    },
+    {
+      "name": "overlapping-ready-writes",
+      "kind": "registry",
+      "base": "overlap",
+      "expected_errors": [
+        "REGISTRY_WRITE_PATH_OVERLAP"
+      ]
+    },
+    {
+      "name": "result-session-mismatch",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "session_id"
+          ],
+          "value": "another-session"
+        }
+      ],
+      "expected_errors": [
+        "RESULT_SESSION_MISMATCH"
+      ]
+    },
+    {
+      "name": "stale-task-specification",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "task_spec_revision"
+          ],
+          "value": 2
+        }
+      ],
+      "expected_errors": [
+        "RESULT_TASK_REVISION_MISMATCH"
+      ]
+    },
+    {
+      "name": "unknown-attempt",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "attempt_id"
+          ],
+          "value": "missing-attempt"
+        }
+      ],
+      "expected_errors": [
+        "RESULT_ATTEMPT_UNKNOWN"
+      ]
+    },
+    {
+      "name": "dispatch-revision-mismatch",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "dispatch_registry_revision"
+          ],
+          "value": 1
+        }
+      ],
+      "expected_errors": [
+        "RESULT_DISPATCH_REVISION_MISMATCH"
+      ]
+    },
+    {
+      "name": "worker-session-mismatch",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "worker_session_id"
+          ],
+          "value": "host-worker-other"
+        }
+      ],
+      "expected_errors": [
+        "RESULT_WORKER_SESSION_MISMATCH"
+      ]
+    },
+    {
+      "name": "terminal-state-mismatch",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "terminal_state"
+          ],
+          "value": "failed"
+        }
+      ],
+      "expected_errors": [
+        "RESULT_TERMINAL_STATE_MISMATCH"
+      ]
+    },
+    {
+      "name": "result-completeness-mismatch",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "result_completeness"
+          ],
+          "value": "partial"
+        }
+      ],
+      "expected_errors": [
+        "RESULT_COMPLETENESS_MISMATCH"
+      ]
+    },
+    {
+      "name": "unexpected-artifact-slot",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "artifacts",
+            0,
+            "slot_id"
+          ],
+          "value": "UNDECLARED"
+        }
+      ],
+      "expected_errors": [
+        "RESULT_ARTIFACT_SLOT_UNKNOWN"
+      ]
+    },
+    {
+      "name": "duplicate-slot-claim",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "artifacts"
+          ],
+          "value": [
+            {
+              "artifact_id": "artifact-01",
+              "slot_id": "OUT-01",
+              "producer_task_id": "sf-20261110-r11k3-02",
+              "producer_attempt_id": "sf-20261110-r11k3-02-a01",
+              "locator": "src/main.py",
+              "immutable_ref": null,
+              "byte_length": 128,
+              "content_digest": {
+                "algorithm": "sha-256",
+                "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              },
+              "acceptance_criteria_ids": [
+                "AC-01"
+              ]
+            },
+            {
+              "artifact_id": "artifact-02",
+              "slot_id": "OUT-01",
+              "producer_task_id": "sf-20261110-r11k3-02",
+              "producer_attempt_id": "sf-20261110-r11k3-02-a01",
+              "locator": "src/main.py",
+              "immutable_ref": null,
+              "byte_length": 128,
+              "content_digest": {
+                "algorithm": "sha-256",
+                "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              },
+              "acceptance_criteria_ids": [
+                "AC-01"
+              ]
+            }
+          ]
+        }
+      ],
+      "expected_errors": [
+        "RESULT_DUPLICATE_SLOT_CLAIM"
+      ]
+    },
+    {
+      "name": "artifact-producer-mismatch",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "artifacts",
+            0,
+            "producer_attempt_id"
+          ],
+          "value": "another-attempt"
+        }
+      ],
+      "expected_errors": [
+        "RESULT_ARTIFACT_PRODUCER_MISMATCH"
+      ]
+    },
+    {
+      "name": "missing-required-artifact",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "artifacts"
+          ],
+          "value": []
+        },
+        {
+          "target": "result",
+          "path": [
+            "acceptance_evidence",
+            0,
+            "artifact_ids"
+          ],
+          "value": []
+        }
+      ],
+      "expected_errors": [
+        "RESULT_REQUIRED_ARTIFACT_MISSING"
+      ]
+    },
+    {
+      "name": "missing-criterion-evidence",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "acceptance_evidence"
+          ],
+          "value": [
+            {
+              "criterion_id": "AC-OTHER",
+              "artifact_ids": [],
+              "evidence_ref": "evidence:other",
+              "verification_command": "inspect"
+            }
+          ]
+        }
+      ],
+      "expected_errors": [
+        "RESULT_CRITERION_EVIDENCE_MISSING"
+      ]
+    },
+    {
+      "name": "unknown-evidence-artifact",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "acceptance_evidence",
+            0,
+            "artifact_ids"
+          ],
+          "value": [
+            "ghost-artifact"
+          ]
+        }
+      ],
+      "expected_errors": [
+        "RESULT_EVIDENCE_ARTIFACT_UNKNOWN"
+      ]
+    },
+    {
+      "name": "artifact-integrity-missing",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "artifacts",
+            0,
+            "content_digest",
+            "value"
+          ],
+          "value": null
+        },
+        {
+          "target": "result",
+          "path": [
+            "artifacts",
+            0,
+            "byte_length"
+          ],
+          "value": null
+        }
+      ],
+      "expected_errors": [
+        "RESULT_ARTIFACT_INTEGRITY_MISSING"
+      ]
+    },
+    {
+      "name": "artifact-path-escape",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "artifacts",
+            0,
+            "locator"
+          ],
+          "value": "../outside.py"
+        }
+      ],
+      "expected_errors": [
+        "RESULT_ARTIFACT_PATH_OUT_OF_SCOPE"
+      ]
+    },
+    {
+      "name": "artifact-criterion-mismatch",
+      "kind": "result",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "result",
+          "path": [
+            "artifacts",
+            0,
+            "acceptance_criteria_ids"
+          ],
+          "value": [
+            "AC-OTHER"
+          ]
+        }
+      ],
+      "expected_errors": [
+        "RESULT_ARTIFACT_CRITERIA_MISMATCH"
+      ]
+    },
+    {
+      "name": "superseded-attempt-result",
+      "kind": "result",
+      "base": "superseded",
       "expected_errors": [
         "RESULT_STALE_ATTEMPT"
       ]
