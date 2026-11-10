@@ -285,23 +285,47 @@ def validate_registry_semantics(registry: dict[str, Any]) -> list[str]:
         if attempts:
             latest = attempts[-1]
             if isinstance(latest, dict):
-                if latest.get("worker_session_id") != worker_session_id:
-                    errors.append(
-                        _error(
-                            "REGISTRY_LATEST_WORKER_MISMATCH",
-                            f"{task_id} worker session does not match its latest attempt",
+                latest_worker_status = latest.get("worker_status")
+                if latest_worker_status in {"dispatch_pending", "queued", "unknown"}:
+                    if owner != "coordinator" or worker_session_id is not None or task.get("worker_status") is not None:
+                        errors.append(
+                            _error(
+                                "REGISTRY_UNCONFIRMED_WORKER_OWNERSHIP",
+                                f"{task_id} must remain coordinator-owned until worker activity is confirmed",
+                            )
                         )
-                    )
-                if (
-                    "worker_status" in latest
-                    and latest.get("worker_status") != task.get("worker_status")
-                ):
-                    errors.append(
-                        _error(
-                            "REGISTRY_LATEST_WORKER_STATUS_MISMATCH",
-                            f"{task_id} worker status does not match its latest attempt",
+                    if latest_worker_status in {"dispatch_pending", "queued"} and task.get("status") != "ready":
+                        errors.append(
+                            _error(
+                                "REGISTRY_QUEUED_TASK_STATE",
+                                f"{task_id} must remain ready while its dispatch is pending or queued",
+                            )
                         )
-                    )
+                    if latest_worker_status == "unknown" and task.get("status") != "blocked":
+                        errors.append(
+                            _error(
+                                "REGISTRY_UNKNOWN_ATTEMPT_NOT_BLOCKED",
+                                f"{task_id} must be blocked while its worker outcome is unknown",
+                            )
+                        )
+                else:
+                    if latest.get("worker_session_id") != worker_session_id:
+                        errors.append(
+                            _error(
+                                "REGISTRY_LATEST_WORKER_MISMATCH",
+                                f"{task_id} worker session does not match its latest active/terminal attempt",
+                            )
+                        )
+                    if (
+                        "worker_status" in latest
+                        and latest.get("worker_status") != task.get("worker_status")
+                    ):
+                        errors.append(
+                            _error(
+                                "REGISTRY_LATEST_WORKER_STATUS_MISMATCH",
+                                f"{task_id} worker status does not match its latest attempt",
+                            )
+                        )
                 if task.get("result_ref") is not None and latest.get("result_ref") != task.get("result_ref"):
                     errors.append(
                         _error(
