@@ -21,6 +21,7 @@ class SkillPackageTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
         self.assertIn("JSON Schema contract fixtures passed.", result.stdout)
+        self.assertIn("Semantic contract fixtures passed (3 valid, 28 invalid).", result.stdout)
         self.assertIn("checks passed", result.stdout)
 
     def test_root_skill_entrypoint_exists(self) -> None:
