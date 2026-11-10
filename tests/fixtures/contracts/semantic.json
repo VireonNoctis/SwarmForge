@@ -987,7 +987,7 @@
           {
             "id": "sf-20261110-r11k3-02",
             "task_spec_revision": 1,
-            "owner": "host-worker-new",
+            "owner": "coordinator",
             "objective": "Implement a bounded source change",
             "context_refs": [
               "SKILL.md"
@@ -1057,8 +1057,8 @@
               "python3 -m unittest discover -s tests -v"
             ],
             "deliverable": "Verified source change",
-            "worker_session_id": "host-worker-new",
-            "worker_status": "unknown",
+            "worker_session_id": null,
+            "worker_status": null,
             "result_ref": null,
             "attempts": [
               {
@@ -1345,6 +1345,149 @@
           }
         ]
       }
+    },
+    "queued": {
+      "registry": {
+        "schema_version": 1,
+        "session_id": "sf-20261110-r11k3",
+        "registry_revision": 3,
+        "objective": "Exercise semantic task/result validation",
+        "requested_worker_cap": 2,
+        "tasks": [
+          {
+            "id": "sf-20261110-r11k3-01",
+            "task_spec_revision": 1,
+            "owner": "coordinator",
+            "objective": "Verify a semantic task and result contract",
+            "context_refs": [
+              "SKILL.md",
+              "docs/ORCHESTRATION_PATTERNS.md"
+            ],
+            "read_paths": [
+              "docs/ORCHESTRATION_PATTERNS.md"
+            ],
+            "write_paths": [],
+            "depends_on": [],
+            "status": "ready",
+            "state_history": [
+              {
+                "from": null,
+                "to": "ready",
+                "actor": "coordinator",
+                "recorded_at": "2026-11-10T13:57:00Z",
+                "registry_revision": 1,
+                "reason": "No dependencies",
+                "evidence_refs": []
+              }
+            ],
+            "acceptance_criteria": [
+              {
+                "id": "AC-01",
+                "description": "Semantic validation succeeds",
+                "verification": "python3 scripts/validate.py"
+              }
+            ],
+            "expected_artifacts": [],
+            "verification_commands": [
+              "python3 scripts/validate.py"
+            ],
+            "deliverable": "Verified semantic contract",
+            "worker_session_id": null,
+            "worker_status": null,
+            "result_ref": null,
+            "attempts": [
+              {
+                "attempt_id": "sf-20261110-r11k3-pending-queued",
+                "dispatch_registry_revision": 2,
+                "worker_session_id": null,
+                "worker_status": "queued",
+                "terminal_state": null,
+                "recorded_at": "2026-11-10T14:01:00Z",
+                "reason": "Host reports queued"
+              }
+            ],
+            "blocked_by": [],
+            "recovery_decision": null
+          }
+        ]
+      }
+    },
+    "unknown": {
+      "registry": {
+        "schema_version": 1,
+        "session_id": "sf-20261110-r11k3",
+        "registry_revision": 3,
+        "objective": "Exercise semantic task/result validation",
+        "requested_worker_cap": 2,
+        "tasks": [
+          {
+            "id": "sf-20261110-r11k3-01",
+            "task_spec_revision": 1,
+            "owner": "coordinator",
+            "objective": "Verify a semantic task and result contract",
+            "context_refs": [
+              "SKILL.md",
+              "docs/ORCHESTRATION_PATTERNS.md"
+            ],
+            "read_paths": [
+              "docs/ORCHESTRATION_PATTERNS.md"
+            ],
+            "write_paths": [],
+            "depends_on": [],
+            "status": "blocked",
+            "state_history": [
+              {
+                "from": null,
+                "to": "ready",
+                "actor": "coordinator",
+                "recorded_at": "2026-11-10T13:57:00Z",
+                "registry_revision": 1,
+                "reason": "No dependencies",
+                "evidence_refs": []
+              },
+              {
+                "from": "ready",
+                "to": "blocked",
+                "actor": "coordinator",
+                "recorded_at": "2026-11-10T14:01:00Z",
+                "registry_revision": 3,
+                "reason": "Worker outcome is unknown",
+                "evidence_refs": [
+                  "host-event:unknown"
+                ]
+              }
+            ],
+            "acceptance_criteria": [
+              {
+                "id": "AC-01",
+                "description": "Semantic validation succeeds",
+                "verification": "python3 scripts/validate.py"
+              }
+            ],
+            "expected_artifacts": [],
+            "verification_commands": [
+              "python3 scripts/validate.py"
+            ],
+            "deliverable": "Verified semantic contract",
+            "worker_session_id": null,
+            "worker_status": null,
+            "result_ref": null,
+            "attempts": [
+              {
+                "attempt_id": "sf-20261110-r11k3-pending-unknown",
+                "dispatch_registry_revision": 2,
+                "worker_session_id": null,
+                "worker_status": "unknown",
+                "terminal_state": null,
+                "recorded_at": "2026-11-10T14:01:00Z",
+                "reason": "Host reports unknown"
+              }
+            ],
+            "blocked_by": [],
+            "recovery_decision": null
+          }
+        ]
+      }
     }
   },
   "valid": [
@@ -1362,6 +1505,16 @@
       "name": "completed-dependency-unlocks-ready-task",
       "kind": "registry",
       "base": "dependency"
+    },
+    {
+      "name": "queued-attempt-keeps-coordinator-ownership",
+      "kind": "registry",
+      "base": "queued"
+    },
+    {
+      "name": "unknown-attempt-blocks-redispatch",
+      "kind": "registry",
+      "base": "unknown"
     }
   ],
   "invalid": [
@@ -1880,6 +2033,91 @@
       "base": "superseded",
       "expected_errors": [
         "RESULT_STALE_ATTEMPT"
+      ]
+    },
+    {
+      "name": "queued-attempt-cannot-be-active",
+      "kind": "registry",
+      "base": "queued",
+      "expected_errors": [
+        "REGISTRY_QUEUED_TASK_STATE"
+      ],
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "status"
+          ],
+          "value": "active"
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "state_history"
+          ],
+          "value": [
+            {
+              "from": null,
+              "to": "ready",
+              "actor": "coordinator",
+              "recorded_at": "2026-11-10T13:57:00Z",
+              "registry_revision": 1,
+              "reason": "No dependencies",
+              "evidence_refs": []
+            },
+            {
+              "from": "ready",
+              "to": "active",
+              "actor": "coordinator",
+              "recorded_at": "2026-11-10T14:01:00Z",
+              "registry_revision": 3,
+              "reason": "Incorrectly activated queued task",
+              "evidence_refs": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "unknown-attempt-must-block-task",
+      "kind": "registry",
+      "base": "unknown",
+      "expected_errors": [
+        "REGISTRY_UNKNOWN_ATTEMPT_NOT_BLOCKED"
+      ],
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "status"
+          ],
+          "value": "ready"
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "state_history"
+          ],
+          "value": [
+            {
+              "from": null,
+              "to": "ready",
+              "actor": "coordinator",
+              "recorded_at": "2026-11-10T13:57:00Z",
+              "registry_revision": 1,
+              "reason": "No dependencies",
+              "evidence_refs": []
+            }
+          ]
+        }
       ]
     }
   ]
