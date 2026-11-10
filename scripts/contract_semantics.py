@@ -5,6 +5,7 @@ This is maintainer-side contract validation, not a host runtime or artifact veri
 
 from __future__ import annotations
 
+import copy
 import heapq
 import json
 import re
@@ -654,8 +655,28 @@ def validate_result_semantics(
     return errors
 
 
+def _materialise_case(case: dict[str, Any], bases: dict[str, Any]) -> tuple[dict[str, Any], Any]:
+    base = bases.get(case.get("base"))
+    if not isinstance(base, dict) or not isinstance(base.get("registry"), dict):
+        raise ValueError(f"unknown or malformed base {case.get('base')!r}")
+    registry = copy.deepcopy(base["registry"])
+    result = copy.deepcopy(base.get("result"))
+    for change in case.get("overrides", []):
+        if not isinstance(change, dict) or change.get("target") not in {"registry", "result"}:
+            raise ValueError("each override must target registry or result")
+        document = registry if change["target"] == "registry" else result
+        path = change.get("path")
+        if not isinstance(document, dict) or not isinstance(path, list) or not path:
+            raise ValueError("override needs an existing document and non-empty path")
+        parent = document
+        for part in path[:-1]:
+            parent = parent[part]
+        parent[path[-1]] = copy.deepcopy(change.get("value"))
+    return registry, result
+
+
 def validate_semantic_fixtures(root: Path) -> tuple[list[str], int, int]:
-    """Validate positive and negative semantic fixtures against both schemas."""
+    """Validate compact positive and negative semantic fixtures against both schemas."""
     fixture_path = root / "tests" / "fixtures" / "contracts" / "semantic.json"
     errors: list[str] = []
     try:
@@ -666,11 +687,14 @@ def validate_semantic_fixtures(root: Path) -> tuple[list[str], int, int]:
     except (ImportError, OSError, UnicodeError, json.JSONDecodeError) as exc:
         return [f"semantic contract fixtures: cannot load inputs ({exc})"], 0, 0
 
-    if not isinstance(bundle, dict) or set(bundle) != {"valid", "invalid"}:
-        return ["semantic contract fixtures: expected exactly 'valid' and 'invalid' arrays"], 0, 0
+    if not isinstance(bundle, dict) or set(bundle) != {"bases", "valid", "invalid"}:
+        return ["semantic contract fixtures: expected bases, valid, and invalid"], 0, 0
+    bases = bundle["bases"]
     valid_cases = bundle["valid"]
     invalid_cases = bundle["invalid"]
-    if not isinstance(valid_cases, list) or not isinstance(invalid_cases, list) or not valid_cases or not invalid_cases:
+    if not isinstance(bases, dict) or not isinstance(valid_cases, list) or not isinstance(invalid_cases, list):
+        return ["semantic contract fixtures: bases must be an object and cases must be arrays"], 0, 0
+    if not valid_cases or not invalid_cases:
         return ["semantic contract fixtures: valid and invalid must both be non-empty arrays"], 0, 0
 
     task_validator = jsonschema.Draft202012Validator(task_schema, format_checker=jsonschema.FormatChecker())
@@ -689,9 +713,13 @@ def validate_semantic_fixtures(root: Path) -> tuple[list[str], int, int]:
                 continue
             names.add(name)
             kind = case.get("kind")
-            registry = case.get("registry")
-            if kind not in {"registry", "result"} or not isinstance(registry, dict):
-                errors.append(f"{label}/{name}: expected kind registry/result and an object registry")
+            if kind not in {"registry", "result"}:
+                errors.append(f"{label}/{name}: kind must be registry or result")
+                continue
+            try:
+                registry, result = _materialise_case(case, bases)
+            except (KeyError, TypeError, ValueError) as exc:
+                errors.append(f"{label}/{name}: cannot materialise fixture ({exc})")
                 continue
             structural_errors = list(task_validator.iter_errors(registry))
             if structural_errors:
@@ -699,9 +727,8 @@ def validate_semantic_fixtures(root: Path) -> tuple[list[str], int, int]:
                 continue
             semantic_errors = validate_registry_semantics(registry)
             if kind == "result":
-                result = case.get("result")
                 if not isinstance(result, dict):
-                    errors.append(f"{label}/{name}: result case requires an object result")
+                    errors.append(f"{label}/{name}: result case requires a result object")
                     continue
                 structural_result_errors = list(result_validator.iter_errors(result))
                 if structural_result_errors:
@@ -709,8 +736,8 @@ def validate_semantic_fixtures(root: Path) -> tuple[list[str], int, int]:
                     continue
                 if not semantic_errors:
                     semantic_errors.extend(validate_result_semantics(registry, result))
-            elif "result" in case:
-                errors.append(f"{label}/{name}: registry-only case must not include result")
+            elif result is not None:
+                errors.append(f"{label}/{name}: registry-only base must not contain a result")
 
             codes = {item.split(":", 1)[0] for item in semantic_errors}
             if expectation == "valid" and semantic_errors:
