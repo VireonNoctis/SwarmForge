@@ -660,7 +660,7 @@ def _materialise_case(case: dict[str, Any], bases: dict[str, Any]) -> tuple[dict
     if not isinstance(base, dict) or not isinstance(base.get("registry"), dict):
         raise ValueError(f"unknown or malformed base {case.get('base')!r}")
     registry = copy.deepcopy(base["registry"])
-    result = copy.deepcopy(base.get("result"))
+    result = None if case.get("kind") == "registry" else copy.deepcopy(base.get("result"))
     for change in case.get("overrides", []):
         if not isinstance(change, dict) or change.get("target") not in {"registry", "result"}:
             raise ValueError("each override must target registry or result")
