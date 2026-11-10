@@ -9,6 +9,8 @@ import sys
 from pathlib import Path
 from urllib.parse import urlparse
 
+from contract_semantics import validate_semantic_fixtures
+
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "SKILL.md"
 CONFIG_FILES = (
@@ -231,6 +233,8 @@ def validate_local_links() -> list[str]:
 def main() -> int:
     errors = validate_json_files()
     errors.extend(validate_contract_schemas())
+    semantic_errors, semantic_valid, semantic_invalid = validate_semantic_fixtures(ROOT)
+    errors.extend(semantic_errors)
     errors.extend(validate_action_pins())
     errors.extend(validate_skill_frontmatter())
 
@@ -247,6 +251,7 @@ def main() -> int:
         print("\n".join(f"ERROR: {item}" for item in errors), file=sys.stderr)
         return 1
     print("JSON Schema contract fixtures passed.")
+    print(f"Semantic contract fixtures passed ({semantic_valid} valid, {semantic_invalid} invalid).")
     print("SwarmForge Skill package checks passed.")
     return 0
 
