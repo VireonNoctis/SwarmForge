@@ -65,6 +65,46 @@ def _depends_on(task_id: str, ancestor_id: str, dependencies: dict[str, list[str
     return False
 
 
+def _coordinator_record_is_complete(task: dict[str, Any]) -> bool:
+    verification = task.get("coordinator_verification")
+    if not isinstance(verification, dict):
+        return False
+    criteria = {
+        item.get("id")
+        for item in task.get("acceptance_criteria", [])
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    outcomes = verification.get("criterion_outcomes")
+    criterion_evidence = verification.get("criterion_evidence_refs")
+    evidence_refs = verification.get("evidence_refs")
+    attempts = task.get("attempts", [])
+    latest = attempts[-1] if isinstance(attempts, list) and attempts else None
+    expected_attempt_id = latest.get("attempt_id") if isinstance(latest, dict) else None
+    return (
+        verification.get("verified_by") == "coordinator"
+        and verification.get("task_spec_revision") == task.get("task_spec_revision")
+        and verification.get("attempt_id") == expected_attempt_id
+        and verification.get("result_correlation") == "matched"
+        and verification.get("artifact_integrity") == "verified"
+        and verification.get("accepted") is True
+        and bool(verification.get("accepted_at"))
+        and bool(verification.get("verified_at"))
+        and isinstance(evidence_refs, list)
+        and bool(evidence_refs)
+        and isinstance(outcomes, dict)
+        and set(outcomes) == criteria
+        and all(outcomes.get(criterion_id) == "pass" for criterion_id in criteria)
+        and isinstance(criterion_evidence, dict)
+        and set(criterion_evidence) == criteria
+        and all(
+            isinstance(criterion_evidence.get(criterion_id), list)
+            and bool(criterion_evidence[criterion_id])
+            and set(criterion_evidence[criterion_id]) <= set(evidence_refs)
+            for criterion_id in criteria
+        )
+    )
+
+
 def _has_completion_evidence(task: dict[str, Any]) -> bool:
     history = task.get("state_history", [])
     if not history or history[-1].get("to") != "completed":
@@ -78,7 +118,105 @@ def _has_completion_evidence(task: dict[str, Any]) -> bool:
             return False
         if not latest.get("acceptance_evidence_refs"):
             return False
-    return True
+    return _coordinator_record_is_complete(task)
+
+
+def _validate_coordinator_verification(
+    task_id: str,
+    task: dict[str, Any],
+    criterion_ids: list[str],
+    registry_revision: int,
+) -> list[str]:
+    errors: list[str] = []
+    verification = task.get("coordinator_verification")
+    if not isinstance(verification, dict):
+        return [_error("REGISTRY_COORDINATOR_VERIFICATION_MISSING", f"{task_id} has no coordinator verification record")]
+
+    attempts = task.get("attempts", [])
+    latest = attempts[-1] if isinstance(attempts, list) and attempts and isinstance(attempts[-1], dict) else None
+    expected_attempt_id = latest.get("attempt_id") if latest else None
+    verified_revision = verification.get("verified_registry_revision")
+    if (
+        verification.get("verified_by") != "coordinator"
+        or verification.get("task_spec_revision") != task.get("task_spec_revision")
+        or verification.get("attempt_id") != expected_attempt_id
+        or not isinstance(verified_revision, int)
+        or verified_revision > registry_revision
+        or (latest is not None and verified_revision < latest.get("dispatch_registry_revision", 0))
+    ):
+        errors.append(_error("REGISTRY_COORDINATOR_VERIFICATION_STALE", f"{task_id} coordinator verification is not bound to the current task specification and latest attempt"))
+
+    outcomes = verification.get("criterion_outcomes")
+    criterion_evidence = verification.get("criterion_evidence_refs")
+    global_evidence = verification.get("evidence_refs")
+    if (
+        not isinstance(outcomes, dict)
+        or set(outcomes) != set(criterion_ids)
+        or not isinstance(criterion_evidence, dict)
+        or set(criterion_evidence) != set(criterion_ids)
+    ):
+        errors.append(_error("REGISTRY_COORDINATOR_CRITERIA_MISMATCH", f"{task_id} coordinator verification must cover exactly its acceptance criteria"))
+    elif isinstance(global_evidence, list):
+        for criterion_id in criterion_ids:
+            refs = criterion_evidence.get(criterion_id)
+            if outcomes.get(criterion_id) != "pending" and (not isinstance(refs, list) or not refs):
+                errors.append(_error("REGISTRY_COORDINATOR_CRITERION_EVIDENCE_MISSING", f"{task_id} criterion {criterion_id} has a non-pending outcome without evidence"))
+            elif isinstance(refs, list) and not set(refs) <= set(global_evidence):
+                errors.append(_error("REGISTRY_COORDINATOR_EVIDENCE_REFERENCE_MISSING", f"{task_id} criterion {criterion_id} evidence is absent from the coordinator record"))
+
+    accepted = verification.get("accepted") is True
+    if accepted:
+        complete = (
+            task.get("status") == "completed"
+            and verification.get("result_correlation") == "matched"
+            and verification.get("artifact_integrity") == "verified"
+            and isinstance(outcomes, dict)
+            and set(outcomes) == set(criterion_ids)
+            and all(outcomes.get(criterion_id) == "pass" for criterion_id in criterion_ids)
+            and isinstance(criterion_evidence, dict)
+            and set(criterion_evidence) == set(criterion_ids)
+            and all(isinstance(criterion_evidence.get(criterion_id), list) and criterion_evidence[criterion_id] for criterion_id in criterion_ids)
+            and isinstance(global_evidence, list)
+            and bool(global_evidence)
+            and verification.get("accepted_at") is not None
+            and verification.get("verified_at") is not None
+        )
+        if not complete:
+            errors.append(_error("REGISTRY_COORDINATOR_ACCEPTANCE_INCOMPLETE", f"{task_id} is accepted without complete coordinator verification"))
+    else:
+        if task.get("status") == "completed":
+            errors.append(_error("REGISTRY_COMPLETED_WITHOUT_COORDINATOR_ACCEPTANCE", f"{task_id} completed without an accepted coordinator verification record"))
+        if verification.get("accepted_at") is not None:
+            errors.append(_error("REGISTRY_COORDINATOR_ACCEPTANCE_TIMESTAMP_MISMATCH", f"{task_id} has accepted_at while accepted is false"))
+    return errors
+
+
+def _validate_workspace_verification(task_id: str, task: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    verification = task.get("workspace_verification")
+    if not isinstance(verification, dict):
+        return [_error("REGISTRY_WORKSPACE_VERIFICATION_MISSING", f"{task_id} has no workspace verification record")]
+    if verification.get("verified_by") != "coordinator":
+        errors.append(_error("REGISTRY_WORKSPACE_VERIFIER_INVALID", f"{task_id} workspace evidence is not coordinator-owned"))
+
+    write_paths = task.get("write_paths", [])
+    mode = verification.get("mode")
+    status = verification.get("status")
+    workspace_ref = verification.get("workspace_ref")
+    evidence_ref = verification.get("evidence_ref")
+    verified_at = verification.get("verified_at")
+    if not write_paths:
+        if mode != "read_only" or status != "not_required" or any(value is not None for value in (workspace_ref, evidence_ref, verified_at)):
+            errors.append(_error("REGISTRY_READ_ONLY_WORKSPACE_MISMATCH", f"{task_id} has no write paths but does not declare a read-only workspace"))
+    else:
+        if mode == "read_only" or status == "not_required":
+            errors.append(_error("REGISTRY_WRITE_WORKSPACE_MISMATCH", f"{task_id} has write paths but declares no writable workspace"))
+        if status == "verified":
+            if not workspace_ref or not evidence_ref or not verified_at:
+                errors.append(_error("REGISTRY_WORKSPACE_EVIDENCE_MISSING", f"{task_id} verified workspace record lacks a workspace, evidence reference, or timestamp"))
+        elif task.get("status") in {"ready", "active", "completed"}:
+            errors.append(_error("REGISTRY_WORKSPACE_NOT_VERIFIED", f"{task_id} cannot be ready, active, or completed without verified workspace evidence"))
+    return errors
 
 
 def _root_blockers(
@@ -335,6 +473,8 @@ def validate_registry_semantics(registry: dict[str, Any]) -> list[str]:
                     )
 
         criteria_ids = [item.get("id") for item in task.get("acceptance_criteria", []) if isinstance(item, dict)]
+        errors.extend(_validate_coordinator_verification(task_id, task, criteria_ids, registry_revision))
+        errors.extend(_validate_workspace_verification(task_id, task))
         if len(criteria_ids) != len(set(criteria_ids)):
             errors.append(_error("REGISTRY_DUPLICATE_CRITERION_ID", f"{task_id} repeats a criterion ID"))
         slot_ids = [item.get("slot_id") for item in task.get("expected_artifacts", []) if isinstance(item, dict)]
@@ -504,6 +644,7 @@ def validate_registry_semantics(registry: dict[str, Any]) -> list[str]:
                 _normalise_repo_path(path)
                 for path in left_task.get("write_paths", [])
             ]
+            left_workspace = left_task.get("workspace_verification", {})
             for right_id, right_task in concurrent[index + 1 :]:
                 if _depends_on(left_id, right_id, dependencies) or _depends_on(right_id, left_id, dependencies):
                     continue
@@ -511,17 +652,33 @@ def validate_registry_semantics(registry: dict[str, Any]) -> list[str]:
                     _normalise_repo_path(path)
                     for path in right_task.get("write_paths", [])
                 ]
-                if any(
+                right_workspace = right_task.get("workspace_verification", {})
+                left_isolated = (
+                    isinstance(left_workspace, dict)
+                    and left_workspace.get("mode") == "isolated"
+                    and left_workspace.get("status") == "verified"
+                    and bool(left_workspace.get("workspace_ref"))
+                )
+                right_isolated = (
+                    isinstance(right_workspace, dict)
+                    and right_workspace.get("mode") == "isolated"
+                    and right_workspace.get("status") == "verified"
+                    and bool(right_workspace.get("workspace_ref"))
+                )
+                same_workspace = (
+                    bool(left_workspace.get("workspace_ref"))
+                    and left_workspace.get("workspace_ref") == right_workspace.get("workspace_ref")
+                )
+                if same_workspace and (left_isolated or right_isolated):
+                    errors.append(_error("REGISTRY_WORKSPACE_REUSED", f"ready/active tasks {left_id} and {right_id} reuse an isolated workspace reference"))
+                overlaps = any(
                     left_path and right_path and _paths_overlap(left_path, right_path)
                     for left_path in left_paths
                     for right_path in right_paths
-                ):
-                    errors.append(
-                        _error(
-                            "REGISTRY_WRITE_PATH_OVERLAP",
-                            f"ready/active tasks {left_id} and {right_id} have overlapping write paths",
-                        )
-                    )
+                )
+                isolated_pair = left_isolated and right_isolated and left_workspace.get("workspace_ref") != right_workspace.get("workspace_ref")
+                if overlaps and not isolated_pair:
+                    errors.append(_error("REGISTRY_WRITE_PATH_OVERLAP", f"ready/active tasks {left_id} and {right_id} have overlapping write paths without distinct verified isolated workspaces"))
 
     return errors
 

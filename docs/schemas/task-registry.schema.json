@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/VireonNoctis/SwarmForge/main/docs/schemas/task-registry.schema.json",
-  "title": "SwarmForge task registry",
-  "description": "Structural contract for one session-local task registry. Graph and lifecycle invariants require coordinator-side semantic validation.",
+  "title": "SwarmForge task registry v2",
+  "description": "Structural contract for one session-local task registry. Version 2 adds coordinator-owned acceptance and workspace verification records; graph and lifecycle invariants still require semantic validation.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -14,7 +14,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": 1
+      "const": 2
     },
     "session_id": {
       "$ref": "#/$defs/identifier"
@@ -329,7 +329,9 @@
         "result_ref",
         "attempts",
         "blocked_by",
-        "recovery_decision"
+        "recovery_decision",
+        "coordinator_verification",
+        "workspace_verification"
       ],
       "properties": {
         "id": {
@@ -444,6 +446,189 @@
                 "accept_verified_deliverable",
                 "fail"
               ]
+            }
+          ]
+        },
+        "coordinator_verification": {
+          "$ref": "#/$defs/coordinator_verification"
+        },
+        "workspace_verification": {
+          "$ref": "#/$defs/workspace_verification"
+        }
+      }
+    },
+    "coordinator_verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verified_by",
+        "task_spec_revision",
+        "attempt_id",
+        "verified_registry_revision",
+        "result_correlation",
+        "artifact_integrity",
+        "criterion_outcomes",
+        "criterion_evidence_refs",
+        "accepted",
+        "accepted_at",
+        "verified_at",
+        "evidence_refs"
+      ],
+      "properties": {
+        "verified_by": {
+          "const": "coordinator"
+        },
+        "task_spec_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "attempt_id": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/identifier"
+            }
+          ]
+        },
+        "verified_registry_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "result_correlation": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "matched",
+            "mismatch"
+          ]
+        },
+        "artifact_integrity": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "verified",
+            "mismatch",
+            "unknown"
+          ]
+        },
+        "criterion_outcomes": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "$ref": "#/$defs/identifier"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "pass",
+              "fail",
+              "unknown"
+            ]
+          }
+        },
+        "criterion_evidence_refs": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "$ref": "#/$defs/identifier"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/string_list"
+          }
+        },
+        "accepted": {
+          "type": "boolean"
+        },
+        "accepted_at": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "format": "date-time"
+            }
+          ]
+        },
+        "verified_at": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "format": "date-time"
+            }
+          ]
+        },
+        "evidence_refs": {
+          "$ref": "#/$defs/string_list"
+        }
+      }
+    },
+    "workspace_verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verified_by",
+        "mode",
+        "status",
+        "workspace_ref",
+        "evidence_ref",
+        "verified_at"
+      ],
+      "properties": {
+        "verified_by": {
+          "const": "coordinator"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "read_only",
+            "isolated",
+            "shared_serialized"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "not_required",
+            "verified",
+            "unverified",
+            "failed"
+          ]
+        },
+        "workspace_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/identifier"
+            }
+          ]
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/non_empty"
+            }
+          ]
+        },
+        "verified_at": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "format": "date-time"
             }
           ]
         }

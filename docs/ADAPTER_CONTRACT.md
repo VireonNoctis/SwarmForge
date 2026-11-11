@@ -389,7 +389,21 @@ Preferred write models:
 1. read-only workspace plus findings;
 2. isolated worktree/branch plus patch or commit;
 3. isolated container plus patch artifact;
-4. shared workspace with explicit writer ownership and locking.
+4. shared workspace with explicit writer ownership and serialized integration.
+
+Registry v2 records the coordinator's workspace assessment on every task:
+
+~~~yaml
+workspace_verification:
+  verified_by: "coordinator"
+  mode: "read_only|isolated|shared_serialized"
+  status: "not_required|verified|unverified|failed"
+  workspace_ref: "<opaque host/workspace reference, or null>"
+  evidence_ref: "<redacted observation or ownership record, or null>"
+  verified_at: "<timestamp, or null>"
+~~~
+
+A writable task cannot become ready, active, or completed until the record is verified. Overlapping write paths are safe only when both tasks have distinct verified isolated workspace references. A shared workspace requires non-overlapping ownership and serialized integration. Read-only tasks declare no write paths. The record describes observed host isolation or coordinator-enforced ownership; it does not make an adapter's assertion self-proving.
 
 The adapter must make the active model visible. Workers must not assume every session shares a filesystem.
 

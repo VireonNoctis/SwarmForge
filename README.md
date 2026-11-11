@@ -74,14 +74,15 @@ The repository also retains its editor, Codespaces, security, and GitHub automat
 
 ## Validate changes
 
-Maintainers can run the package checks with Python 3 and its standard library:
+Maintainers can run the package checks with Python 3 and the pinned maintainer-only dependency:
 
 ~~~bash
+python3 -m pip install -r requirements-dev.txt
 python3 scripts/validate.py
 python3 -m unittest discover -s tests -v
 ~~~
 
-These checks validate package structure and smoke tests. They do not test provider integrations or prove 500-session capacity.
+These checks validate Skill packaging, JSON Schema fixtures, semantic task/result contracts, and smoke tests. They do not test provider integrations or prove 500-session capacity. The `jsonschema` dependency is for maintainers only; it is not required to install or use the portable Skill.
 
 ## Principles
 

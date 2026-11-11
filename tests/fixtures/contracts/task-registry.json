@@ -3,7 +3,7 @@
     {
       "name": "single-agent",
       "document": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261109-r10q6",
         "registry_revision": 3,
         "objective": "Publish machine-readable task and result contracts",
@@ -71,7 +71,33 @@
             "result_ref": null,
             "attempts": [],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": null,
+              "verified_registry_revision": 3,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "shared_serialized",
+              "status": "verified",
+              "workspace_ref": "workspace-shared",
+              "evidence_ref": "workspace-evidence:sf-20261109-r10q6-01",
+              "verified_at": "2026-11-10T14:00:00Z"
+            }
           }
         ]
       }
@@ -79,7 +105,7 @@
     {
       "name": "worker-owned",
       "document": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261109-r10q6",
         "registry_revision": 4,
         "objective": "Publish machine-readable task and result contracts",
@@ -165,7 +191,33 @@
               }
             ],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": "sf-20261109-r10q6-01-a01",
+              "verified_registry_revision": 4,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "shared_serialized",
+              "status": "verified",
+              "workspace_ref": "workspace-shared",
+              "evidence_ref": "workspace-evidence:sf-20261109-r10q6-01",
+              "verified_at": "2026-11-10T14:00:00Z"
+            }
           }
         ]
       }
@@ -175,7 +227,7 @@
     {
       "name": "missing-owner",
       "document": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261109-r10q6",
         "registry_revision": 3,
         "objective": "Publish machine-readable task and result contracts",
@@ -242,7 +294,33 @@
             "result_ref": null,
             "attempts": [],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": null,
+              "verified_registry_revision": 3,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "shared_serialized",
+              "status": "verified",
+              "workspace_ref": "workspace-shared",
+              "evidence_ref": "workspace-evidence:sf-20261109-r10q6-01",
+              "verified_at": "2026-11-10T14:00:00Z"
+            }
           }
         ]
       }
@@ -250,7 +328,7 @@
     {
       "name": "unknown-state",
       "document": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261109-r10q6",
         "registry_revision": 3,
         "objective": "Publish machine-readable task and result contracts",
@@ -318,7 +396,33 @@
             "result_ref": null,
             "attempts": [],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": null,
+              "verified_registry_revision": 3,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "shared_serialized",
+              "status": "verified",
+              "workspace_ref": "workspace-shared",
+              "evidence_ref": "workspace-evidence:sf-20261109-r10q6-01",
+              "verified_at": "2026-11-10T14:00:00Z"
+            }
           }
         ]
       }

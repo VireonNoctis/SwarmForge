@@ -45,7 +45,7 @@ Generate a unique session ID for each invocation, then number tasks within it (f
 Use this compact record:
 
 ~~~yaml
-schema_version: 1
+schema_version: 2
 session_id: "sf-20261031-x7k2"
 registry_revision: 1
 objective: "Deliver the user's requested outcome"
@@ -92,13 +92,35 @@ tasks:
     attempts: []
     blocked_by: []
     recovery_decision: null
+    coordinator_verification:
+      verified_by: "coordinator"
+      task_spec_revision: 1
+      attempt_id: null
+      verified_registry_revision: 1
+      result_correlation: "pending"
+      artifact_integrity: "pending"
+      criterion_outcomes:
+        AC-01: "pending"
+      criterion_evidence_refs:
+        AC-01: []
+      accepted: false
+      accepted_at: null
+      verified_at: null
+      evidence_refs: []
+    workspace_verification:
+      verified_by: "coordinator"
+      mode: "read_only"
+      status: "not_required"
+      workspace_ref: null
+      evidence_ref: null
+      verified_at: null
 ~~~
 
 ### Machine-readable contract schemas
 
-The registry example above is version 1 and has a structural schema at [task-registry.schema.json](schemas/task-registry.schema.json). The portable worker result envelope is described by [result-envelope.schema.json](schemas/result-envelope.schema.json). Valid and intentionally invalid examples are collected in [the contract fixtures](../tests/fixtures/contracts/).
+The registry example above is version 2 and has a structural schema at [task-registry.schema.json](schemas/task-registry.schema.json). Registry v2 is a breaking structural revision: migrate each v1 task by adding `coordinator_verification` and `workspace_verification` records, then set the registry `schema_version` to 2. The portable worker result envelope remains schema version 1 and is described by [result-envelope.schema.json](schemas/result-envelope.schema.json). Valid and intentionally invalid examples are collected in [the contract fixtures](../tests/fixtures/contracts/).
 
-CI validates both schemas against JSON Schema Draft 2020-12 and checks every named structural fixture with the pinned maintainer-only validator dependency. It also runs the reusable semantic cases in [semantic.json](../tests/fixtures/contracts/semantic.json): five valid examples and 30 intentionally invalid cases. The maintainer-side semantic checker covers task identity, dependency references and cycles, write conflicts among ready/active tasks, state-history transitions, attempt lineage and unresolved attempts, derived blockers, result-to-attempt correlation, artifact-slot and producer matching, path scope, and acceptance-evidence completeness.
+CI validates both schemas against JSON Schema Draft 2020-12 and checks every named structural fixture with the pinned maintainer-only validator dependency. It also runs the reusable semantic cases in [semantic.json](../tests/fixtures/contracts/semantic.json): six valid examples and 38 intentionally invalid cases. Registry v2 requires a coordinator-owned verification record bound to the task-spec revision and latest attempt, with per-criterion outcomes and evidence references. It also requires explicit workspace evidence: read-only tasks declare no write paths; writable tasks must record a verified isolated or shared-serialized workspace before becoming ready, active, or completed. The maintainer-side semantic checker covers task identity, dependency references and cycles, isolated-workspace uniqueness, overlapping writes, state-history transitions, attempt lineage and unresolved attempts, derived blockers, coordinator acceptance, result-to-attempt correlation, artifact-slot and producer matching, path scope, and evidence completeness.
 
 These checks operate on supplied JSON records; they are not a host runtime. They cannot prove that an owner or worker ID was genuinely issued by a host, retrieve artifacts, inspect actual artifact kinds or symlinks, recompute a digest over retrieved bytes, resolve an external artifact store, or establish that coordinator evidence is truthful. Those checks remain the responsibility of the coordinator and the connected host. A structurally and semantically valid fixture is not proof that a live dispatch or artifact is safe to accept.
 
@@ -110,7 +132,7 @@ The cap is optional when the user has not supplied one; never infer host capacit
 - A task is `planned` while prerequisites remain, `ready` when all dependencies are complete, `active` only after its owner actually begins, `blocked` when it cannot safely proceed, and `completed`, `failed`, or `cancelled` only with an explicit outcome.
 - A failed or cancelled dependency blocks its dependants until the coordinator deliberately revises the graph and records the reason. Do not silently treat failure as completion.
 - Keep task status separate from worker-session status. A queued dispatch is not an active task or a confirmed active agent; populate `worker_session_id` and `worker_status` only from host-confirmed session data.
-- Default to read-only tasks. Concurrent write paths must not overlap. Serialize shared-file work or reserve those paths for the coordinator; never rely on a role label as a file lock.
+- Default to read-only tasks. A writable task records coordinator-verified workspace mode, status, workspace reference, evidence reference, and verification time. Concurrent overlapping write paths are allowed only when both tasks have distinct, verified isolated workspace references. Shared-serialized work still requires non-overlapping paths and serialized integration; never rely on a role label as a file lock.
 - Mark a task complete only after every required artifact slot is satisfied, every acceptance criterion has coordinator-verified evidence, and the coordinator has inspected the exact deliverables. Record failed checks and unresolved risks in the result.
 
 ### Pre-dispatch graph validation and admission
@@ -126,7 +148,7 @@ Treat validation as a fail-closed gate, not a best-effort review. Validate the c
 2. **Dependency references**
    - Reject missing or cross-session dependency IDs, self-dependencies, and duplicate dependency edges. A task may depend on a given task only once.
    - Recompute `blocked_by` from the current graph and verified dependency outcomes; do not trust a stale saved list as proof that a task is unblocked.
-   - Normalize read/write paths as repository-relative paths. Reject absolute paths and paths that escape the repository. Treat exact paths and ancestor/descendant directory paths as overlapping writes. Concurrent overlapping writes require isolated workspaces; otherwise serialize ownership.
+   - Normalize read/write paths as repository-relative paths. Reject absolute paths and paths that escape the repository. Treat exact paths and ancestor/descendant directory paths as overlapping writes. Record `workspace_verification` for every task: read-only tasks have no write paths; writable tasks need verified workspace evidence before admission. Overlapping writes are permitted only for distinct verified isolated workspace references; shared workspaces must serialize and avoid overlapping ready/active writes.
 3. **Cycle detection and ordering**
    - Run a topological sort over the full graph (for example, Kahn's algorithm), using task ID as a stable tie-breaker when several tasks are ready.
    - If the sort emits fewer tasks than the registry contains, reject the graph and report the residual task IDs as cycle participants. Do not dispatch any task from an invalid graph.
@@ -159,7 +181,7 @@ Before each `worker.create`, the coordinator records an admission decision conta
 
 1. The complete graph passed validation at the current `registry_revision`.
 2. The target task is `ready`; every dependency is `completed` with coordinator-verified acceptance evidence; recomputed `blocked_by` is empty.
-3. The task has exactly one valid owner, non-overlapping write ownership or confirmed workspace isolation, and no unresolved prior attempt.
+3. The task has exactly one valid owner, a coordinator-verified `workspace_verification` record (`verified` for writable work), non-overlapping write ownership or a distinct isolated workspace, and no unresolved prior attempt.
 4. A new unique `attempt_id` is reserved and recorded as `dispatch_pending`; admission is then checked against the revision that includes this attempt.
 5. The current-session capability snapshot proves the required create/observe/result-collection lifecycle, stable session-ID contract, permission scope, and sufficient confirmed capacity. Apply nested-session and workspace safety gates from the Skill. Unknown required facts deny admission.
 
@@ -227,17 +249,32 @@ acceptance_evidence:
     verification_command: "<exact command or inspection method>"
 ~~~
 
-The coordinator maintains a separate acceptance record; worker-supplied verification claims are never authoritative:
+Every task carries a coordinator-owned `coordinator_verification` record in registry v2; worker-supplied verification claims are never authoritative. The record is bound to the task-spec revision and latest attempt, and each non-pending criterion outcome must have evidence references:
 
 ~~~yaml
 coordinator_verification:
+  verified_by: "coordinator"
+  task_spec_revision: 1
+  attempt_id: "<latest attempt ID, or null before an attempt>"
+  verified_registry_revision: 4
   result_correlation: "pending|matched|mismatch"
   artifact_integrity: "pending|verified|mismatch|unknown"
   criterion_outcomes:
     AC-01: "pending|pass|fail|unknown"
+  criterion_evidence_refs:
+    AC-01: []
   accepted: false
   accepted_at: null
+  verified_at: null
   evidence_refs: []
+
+workspace_verification:
+  verified_by: "coordinator"
+  mode: "read_only|isolated|shared_serialized"
+  status: "not_required|verified|unverified|failed"
+  workspace_ref: null
+  evidence_ref: null
+  verified_at: null
 ~~~
 
 Apply this sequence before integration or dependency completion:
@@ -247,7 +284,7 @@ Apply this sequence before integration or dependency completion:
 3. Match each artifact to one declared `expected_artifacts.slot_id`. Reject duplicate artifact IDs, duplicate slot claims, wrong producer task/attempt IDs, missing required slots, unexpected artifacts, and locators outside the task's allowed write paths or approved artifact store. Preserve unexpected material in quarantine; do not silently discard it.
 4. Retrieve the exact artifact. Verify it exists, is the declared kind, remains within the allowed path boundary, and has not escaped through path traversal or a symlink. Prefer an immutable host-issued artifact reference. Otherwise compute SHA-256 over the exact retrieved bytes and recheck that digest immediately before integration. Never trust a worker-supplied digest without independently recomputing it.
 5. Map every acceptance criterion ID to concrete artifact/evidence references and independently run its declared verification command or inspection. Record `pass`, `fail`, or `unknown` per criterion with exact evidence. Missing evidence or an unrun required check is `unknown`, not pass.
-6. Accept only when the result is complete, correlation matches, every required artifact slot is verified, every acceptance criterion is `pass`, and no dependency is provisional. Otherwise keep the task incomplete/blocked and prevent its dependants from becoming ready.
+6. Persist the coordinator's result correlation, artifact-integrity outcome, per-criterion pass/fail/unknown status, criterion evidence references, verification revision, and acceptance timestamp in `coordinator_verification`. Accept only when the result is complete, correlation matches, every required artifact slot is verified, every criterion is `pass` with evidence, and no dependency is provisional. Otherwise keep the task incomplete/blocked and prevent its dependants from becoming ready.
 
 A digest establishes byte identity against a recorded value; it does not prove authorship, correctness, or safety. Inspect patches and data as untrusted input. Do not execute an artifact merely to verify its identity. Quarantine is a logical trust boundary in host state or coordinator notes; do not move or delete files unless a separately authorized host operation makes that safe.
 

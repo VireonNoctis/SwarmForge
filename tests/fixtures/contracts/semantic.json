@@ -2,7 +2,7 @@
   "bases": {
     "coordinator": {
       "registry": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261110-r11k3",
         "registry_revision": 3,
         "objective": "Exercise semantic task/result validation",
@@ -89,7 +89,38 @@
               }
             ],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": "sf-20261110-r11k3-01-a01",
+              "verified_registry_revision": 3,
+              "result_correlation": "matched",
+              "artifact_integrity": "verified",
+              "criterion_outcomes": {
+                "AC-01": "pass"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": [
+                  "coordinator-evidence:sf-20261110-r11k3-01:AC-01"
+                ]
+              },
+              "accepted": true,
+              "accepted_at": "2026-11-10T14:00:00Z",
+              "verified_at": "2026-11-10T14:00:00Z",
+              "evidence_refs": [
+                "coordinator-verification:sf-20261110-r11k3-01:sf-20261110-r11k3-01-a01",
+                "coordinator-evidence:sf-20261110-r11k3-01:AC-01"
+              ]
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "read_only",
+              "status": "not_required",
+              "workspace_ref": null,
+              "evidence_ref": null,
+              "verified_at": null
+            }
           }
         ]
       },
@@ -117,7 +148,7 @@
     },
     "worker": {
       "registry": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261110-r11k3",
         "registry_revision": 3,
         "objective": "Exercise semantic task/result validation",
@@ -221,7 +252,38 @@
               }
             ],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": "sf-20261110-r11k3-02-a01",
+              "verified_registry_revision": 3,
+              "result_correlation": "matched",
+              "artifact_integrity": "verified",
+              "criterion_outcomes": {
+                "AC-01": "pass"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": [
+                  "coordinator-evidence:sf-20261110-r11k3-02:AC-01"
+                ]
+              },
+              "accepted": true,
+              "accepted_at": "2026-11-10T14:00:00Z",
+              "verified_at": "2026-11-10T14:00:00Z",
+              "evidence_refs": [
+                "coordinator-verification:sf-20261110-r11k3-02:sf-20261110-r11k3-02-a01",
+                "coordinator-evidence:sf-20261110-r11k3-02:AC-01"
+              ]
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "shared_serialized",
+              "status": "verified",
+              "workspace_ref": "workspace-shared",
+              "evidence_ref": "workspace-evidence:sf-20261110-r11k3-02",
+              "verified_at": "2026-11-10T14:00:00Z"
+            }
           }
         ]
       },
@@ -268,7 +330,7 @@
     },
     "dependency": {
       "registry": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261110-r11k3",
         "registry_revision": 4,
         "objective": "Exercise semantic task/result validation",
@@ -355,7 +417,38 @@
               }
             ],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": "sf-20261110-r11k3-01-a01",
+              "verified_registry_revision": 4,
+              "result_correlation": "matched",
+              "artifact_integrity": "verified",
+              "criterion_outcomes": {
+                "AC-01": "pass"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": [
+                  "coordinator-evidence:sf-20261110-r11k3-01:AC-01"
+                ]
+              },
+              "accepted": true,
+              "accepted_at": "2026-11-10T14:00:00Z",
+              "verified_at": "2026-11-10T14:00:00Z",
+              "evidence_refs": [
+                "coordinator-verification:sf-20261110-r11k3-01:sf-20261110-r11k3-01-a01",
+                "coordinator-evidence:sf-20261110-r11k3-01:AC-01"
+              ]
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "read_only",
+              "status": "not_required",
+              "workspace_ref": null,
+              "evidence_ref": null,
+              "verified_at": null
+            }
           },
           {
             "id": "sf-20261110-r11k3-03",
@@ -404,14 +497,40 @@
             "result_ref": null,
             "attempts": [],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": null,
+              "verified_registry_revision": 4,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "shared_serialized",
+              "status": "verified",
+              "workspace_ref": "workspace-shared",
+              "evidence_ref": "workspace-evidence:sf-20261110-r11k3-03",
+              "verified_at": "2026-11-10T14:00:00Z"
+            }
           }
         ]
       }
     },
     "cycle": {
       "registry": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261110-r11k3",
         "registry_revision": 1,
         "objective": "Exercise semantic task/result validation",
@@ -464,7 +583,33 @@
             "blocked_by": [
               "sf-20261110-r11k3-cycle-b"
             ],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": null,
+              "verified_registry_revision": 1,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "read_only",
+              "status": "not_required",
+              "workspace_ref": null,
+              "evidence_ref": null,
+              "verified_at": null
+            }
           },
           {
             "id": "sf-20261110-r11k3-cycle-b",
@@ -513,14 +658,40 @@
             "blocked_by": [
               "sf-20261110-r11k3-cycle-a"
             ],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": null,
+              "verified_registry_revision": 1,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "read_only",
+              "status": "not_required",
+              "workspace_ref": null,
+              "evidence_ref": null,
+              "verified_at": null
+            }
           }
         ]
       }
     },
     "duplicateTask": {
       "registry": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261110-r11k3",
         "registry_revision": 3,
         "objective": "Exercise semantic task/result validation",
@@ -607,7 +778,38 @@
               }
             ],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": "sf-20261110-r11k3-01-a01",
+              "verified_registry_revision": 3,
+              "result_correlation": "matched",
+              "artifact_integrity": "verified",
+              "criterion_outcomes": {
+                "AC-01": "pass"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": [
+                  "coordinator-evidence:sf-20261110-r11k3-01:AC-01"
+                ]
+              },
+              "accepted": true,
+              "accepted_at": "2026-11-10T14:00:00Z",
+              "verified_at": "2026-11-10T14:00:00Z",
+              "evidence_refs": [
+                "coordinator-verification:sf-20261110-r11k3-01:sf-20261110-r11k3-01-a01",
+                "coordinator-evidence:sf-20261110-r11k3-01:AC-01"
+              ]
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "read_only",
+              "status": "not_required",
+              "workspace_ref": null,
+              "evidence_ref": null,
+              "verified_at": null
+            }
           },
           {
             "id": "sf-20261110-r11k3-01",
@@ -690,14 +892,45 @@
               }
             ],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": "sf-20261110-r11k3-01-a01",
+              "verified_registry_revision": 3,
+              "result_correlation": "matched",
+              "artifact_integrity": "verified",
+              "criterion_outcomes": {
+                "AC-01": "pass"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": [
+                  "coordinator-evidence:sf-20261110-r11k3-01:AC-01"
+                ]
+              },
+              "accepted": true,
+              "accepted_at": "2026-11-10T14:00:00Z",
+              "verified_at": "2026-11-10T14:00:00Z",
+              "evidence_refs": [
+                "coordinator-verification:sf-20261110-r11k3-01:sf-20261110-r11k3-01-a01",
+                "coordinator-evidence:sf-20261110-r11k3-01:AC-01"
+              ]
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "read_only",
+              "status": "not_required",
+              "workspace_ref": null,
+              "evidence_ref": null,
+              "verified_at": null
+            }
           }
         ]
       }
     },
     "duplicateAttempt": {
       "registry": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261110-r11k3",
         "registry_revision": 4,
         "objective": "Exercise semantic task/result validation",
@@ -784,7 +1017,38 @@
               }
             ],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": "sf-20261110-r11k3-01-a01",
+              "verified_registry_revision": 4,
+              "result_correlation": "matched",
+              "artifact_integrity": "verified",
+              "criterion_outcomes": {
+                "AC-01": "pass"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": [
+                  "coordinator-evidence:sf-20261110-r11k3-01:AC-01"
+                ]
+              },
+              "accepted": true,
+              "accepted_at": "2026-11-10T14:00:00Z",
+              "verified_at": "2026-11-10T14:00:00Z",
+              "evidence_refs": [
+                "coordinator-verification:sf-20261110-r11k3-01:sf-20261110-r11k3-01-a01",
+                "coordinator-evidence:sf-20261110-r11k3-01:AC-01"
+              ]
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "read_only",
+              "status": "not_required",
+              "workspace_ref": null,
+              "evidence_ref": null,
+              "verified_at": null
+            }
           },
           {
             "id": "sf-20261110-r11k3-duplicate-attempt",
@@ -845,14 +1109,40 @@
               }
             ],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": "sf-20261110-r11k3-01-a01",
+              "verified_registry_revision": 4,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "read_only",
+              "status": "not_required",
+              "workspace_ref": null,
+              "evidence_ref": null,
+              "verified_at": null
+            }
           }
         ]
       }
     },
     "crossLineage": {
       "registry": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261110-r11k3",
         "registry_revision": 2,
         "objective": "Exercise semantic task/result validation",
@@ -913,7 +1203,33 @@
               }
             ],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": "attempt-a",
+              "verified_registry_revision": 2,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "read_only",
+              "status": "not_required",
+              "workspace_ref": null,
+              "evidence_ref": null,
+              "verified_at": null
+            }
           },
           {
             "id": "sf-20261110-r11k3-lineage-b",
@@ -971,14 +1287,40 @@
               }
             ],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": "attempt-b",
+              "verified_registry_revision": 2,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "read_only",
+              "status": "not_required",
+              "workspace_ref": null,
+              "evidence_ref": null,
+              "verified_at": null
+            }
           }
         ]
       }
     },
     "unresolved": {
       "registry": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261110-r11k3",
         "registry_revision": 3,
         "objective": "Exercise semantic task/result validation",
@@ -1093,14 +1435,40 @@
               }
             ],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": "unresolved-a02",
+              "verified_registry_revision": 3,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "shared_serialized",
+              "status": "verified",
+              "workspace_ref": "workspace-shared",
+              "evidence_ref": "workspace-evidence:sf-20261110-r11k3-02",
+              "verified_at": "2026-11-10T14:00:00Z"
+            }
           }
         ]
       }
     },
     "overlap": {
       "registry": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261110-r11k3",
         "registry_revision": 2,
         "objective": "Exercise semantic task/result validation",
@@ -1151,7 +1519,33 @@
             "result_ref": null,
             "attempts": [],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": null,
+              "verified_registry_revision": 2,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "shared_serialized",
+              "status": "verified",
+              "workspace_ref": "workspace-shared",
+              "evidence_ref": "workspace-evidence:sf-20261110-r11k3-write-a",
+              "verified_at": "2026-11-10T14:00:00Z"
+            }
           },
           {
             "id": "sf-20261110-r11k3-write-b",
@@ -1198,14 +1592,40 @@
             "result_ref": null,
             "attempts": [],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": null,
+              "verified_registry_revision": 2,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "shared_serialized",
+              "status": "verified",
+              "workspace_ref": "workspace-shared",
+              "evidence_ref": "workspace-evidence:sf-20261110-r11k3-write-b",
+              "verified_at": "2026-11-10T14:00:00Z"
+            }
           }
         ]
       }
     },
     "superseded": {
       "registry": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261110-r11k3",
         "registry_revision": 4,
         "objective": "Exercise semantic task/result validation",
@@ -1320,7 +1740,33 @@
               }
             ],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": "latest-attempt",
+              "verified_registry_revision": 4,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "shared_serialized",
+              "status": "verified",
+              "workspace_ref": "workspace-shared",
+              "evidence_ref": "workspace-evidence:sf-20261110-r11k3-02",
+              "verified_at": "2026-11-10T14:00:00Z"
+            }
           }
         ]
       },
@@ -1348,7 +1794,7 @@
     },
     "queued": {
       "registry": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261110-r11k3",
         "registry_revision": 3,
         "objective": "Exercise semantic task/result validation",
@@ -1407,14 +1853,40 @@
               }
             ],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": "sf-20261110-r11k3-pending-queued",
+              "verified_registry_revision": 3,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "read_only",
+              "status": "not_required",
+              "workspace_ref": null,
+              "evidence_ref": null,
+              "verified_at": null
+            }
           }
         ]
       }
     },
     "unknown": {
       "registry": {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": "sf-20261110-r11k3",
         "registry_revision": 3,
         "objective": "Exercise semantic task/result validation",
@@ -1484,7 +1956,33 @@
               }
             ],
             "blocked_by": [],
-            "recovery_decision": null
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": "sf-20261110-r11k3-pending-unknown",
+              "verified_registry_revision": 3,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "read_only",
+              "status": "not_required",
+              "workspace_ref": null,
+              "evidence_ref": null,
+              "verified_at": null
+            }
           }
         ]
       }
@@ -1515,6 +2013,45 @@
       "name": "unknown-attempt-blocks-redispatch",
       "kind": "registry",
       "base": "unknown"
+    },
+    {
+      "name": "isolated-workspaces-permit-overlapping-writes",
+      "kind": "registry",
+      "base": "overlap",
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "workspace_verification"
+          ],
+          "value": {
+            "verified_by": "coordinator",
+            "mode": "isolated",
+            "status": "verified",
+            "workspace_ref": "workspace-task-a",
+            "evidence_ref": "workspace-proof-task-a",
+            "verified_at": "2026-11-10T14:05:00Z"
+          }
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            1,
+            "workspace_verification"
+          ],
+          "value": {
+            "verified_by": "coordinator",
+            "mode": "isolated",
+            "status": "verified",
+            "workspace_ref": "workspace-task-b",
+            "evidence_ref": "workspace-proof-task-b",
+            "verified_at": "2026-11-10T14:05:00Z"
+          }
+        }
+      ]
     }
   ],
   "invalid": [
@@ -2118,6 +2655,326 @@
             }
           ]
         }
+      ]
+    },
+    {
+      "name": "workspace-not-verified-before-dispatch",
+      "kind": "registry",
+      "base": "worker",
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "workspace_verification",
+            "status"
+          ],
+          "value": "unverified"
+        }
+      ],
+      "expected_errors": [
+        "REGISTRY_WORKSPACE_NOT_VERIFIED"
+      ]
+    },
+    {
+      "name": "isolated-workspace-reference-reused",
+      "kind": "registry",
+      "base": "overlap",
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "workspace_verification"
+          ],
+          "value": {
+            "verified_by": "coordinator",
+            "mode": "isolated",
+            "status": "verified",
+            "workspace_ref": "workspace-reused",
+            "evidence_ref": "workspace-proof-a",
+            "verified_at": "2026-11-10T14:05:00Z"
+          }
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            1,
+            "workspace_verification"
+          ],
+          "value": {
+            "verified_by": "coordinator",
+            "mode": "isolated",
+            "status": "verified",
+            "workspace_ref": "workspace-reused",
+            "evidence_ref": "workspace-proof-b",
+            "verified_at": "2026-11-10T14:05:00Z"
+          }
+        }
+      ],
+      "expected_errors": [
+        "REGISTRY_WORKSPACE_REUSED"
+      ]
+    },
+    {
+      "name": "coordinator-verification-stale-task-spec",
+      "kind": "registry",
+      "base": "coordinator",
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "task_spec_revision"
+          ],
+          "value": 2
+        }
+      ],
+      "expected_errors": [
+        "REGISTRY_COORDINATOR_VERIFICATION_STALE"
+      ]
+    },
+    {
+      "name": "coordinator-accepted-with-unknown-criterion",
+      "kind": "registry",
+      "base": "coordinator",
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "criterion_outcomes",
+            "AC-01"
+          ],
+          "value": "unknown"
+        }
+      ],
+      "expected_errors": [
+        "REGISTRY_COORDINATOR_ACCEPTANCE_INCOMPLETE"
+      ]
+    },
+    {
+      "name": "coordinator-criterion-evidence-missing",
+      "kind": "registry",
+      "base": "coordinator",
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "criterion_evidence_refs",
+            "AC-01"
+          ],
+          "value": []
+        }
+      ],
+      "expected_errors": [
+        "REGISTRY_COORDINATOR_CRITERION_EVIDENCE_MISSING"
+      ]
+    },
+    {
+      "name": "completed-without-coordinator-acceptance",
+      "kind": "registry",
+      "base": "coordinator",
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "result_correlation"
+          ],
+          "value": "pending"
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "artifact_integrity"
+          ],
+          "value": "pending"
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "criterion_outcomes",
+            "AC-01"
+          ],
+          "value": "pending"
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "criterion_evidence_refs",
+            "AC-01"
+          ],
+          "value": []
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "accepted"
+          ],
+          "value": false
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "accepted_at"
+          ],
+          "value": null
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "verified_at"
+          ],
+          "value": null
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "evidence_refs"
+          ],
+          "value": []
+        }
+      ],
+      "expected_errors": [
+        "REGISTRY_COMPLETED_WITHOUT_COORDINATOR_ACCEPTANCE"
+      ]
+    },
+    {
+      "name": "isolated-workspace-shares-reference-with-shared-workspace",
+      "kind": "registry",
+      "base": "overlap",
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "workspace_verification"
+          ],
+          "value": {
+            "verified_by": "coordinator",
+            "mode": "isolated",
+            "status": "verified",
+            "workspace_ref": "workspace-shared",
+            "evidence_ref": "workspace-proof-isolated",
+            "verified_at": "2026-11-10T14:05:00Z"
+          }
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            1,
+            "workspace_verification"
+          ],
+          "value": {
+            "verified_by": "coordinator",
+            "mode": "shared_serialized",
+            "status": "verified",
+            "workspace_ref": "workspace-shared",
+            "evidence_ref": "workspace-proof-shared",
+            "verified_at": "2026-11-10T14:05:00Z"
+          }
+        }
+      ],
+      "expected_errors": [
+        "REGISTRY_WORKSPACE_REUSED"
+      ]
+    },
+    {
+      "name": "coordinator-failed-criterion-without-evidence",
+      "kind": "registry",
+      "base": "coordinator",
+      "overrides": [
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "criterion_outcomes",
+            "AC-01"
+          ],
+          "value": "fail"
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "criterion_evidence_refs",
+            "AC-01"
+          ],
+          "value": []
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "accepted"
+          ],
+          "value": false
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "accepted_at"
+          ],
+          "value": null
+        },
+        {
+          "target": "registry",
+          "path": [
+            "tasks",
+            0,
+            "coordinator_verification",
+            "evidence_refs"
+          ],
+          "value": []
+        }
+      ],
+      "expected_errors": [
+        "REGISTRY_COORDINATOR_CRITERION_EVIDENCE_MISSING"
       ]
     }
   ]

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 import unittest
@@ -21,7 +22,7 @@ class SkillPackageTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
         self.assertIn("JSON Schema contract fixtures passed.", result.stdout)
-        self.assertIn("Semantic contract fixtures passed (5 valid, 30 invalid).", result.stdout)
+        self.assertIn("Semantic contract fixtures passed (6 valid, 38 invalid).", result.stdout)
         self.assertIn("checks passed", result.stdout)
 
     def test_root_skill_entrypoint_exists(self) -> None:
@@ -190,6 +191,10 @@ class SkillPackageTests(unittest.TestCase):
             "sha-256",
             "digest establishes byte identity",
             "does not prove authorship",
+            "verified_registry_revision",
+            "criterion_evidence_refs",
+            "workspace_verification",
+            "distinct verified isolated workspace references",
         ):
             with self.subTest(pattern=phrase):
                 self.assertIn(phrase.lower(), combined)
@@ -423,6 +428,19 @@ class SkillPackageTests(unittest.TestCase):
         ):
             with self.subTest(skill_phrase=phrase):
                 self.assertIn(phrase.lower(), skill.lower())
+
+    def test_registry_v2_requires_coordinator_and_workspace_evidence(self) -> None:
+        schema = json.loads(
+            (ROOT / "docs" / "schemas" / "task-registry.schema.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        task = schema["$defs"]["task"]
+        self.assertEqual(schema["properties"]["schema_version"]["const"], 2)
+        for field in ("coordinator_verification", "workspace_verification"):
+            with self.subTest(field=field):
+                self.assertIn(field, task["required"])
+                self.assertIn(field, task["properties"])
 
     def test_skill_metadata_names_the_skill(self) -> None:
         text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
