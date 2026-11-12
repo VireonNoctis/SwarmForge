@@ -191,13 +191,46 @@ def _validate_coordinator_verification(
     return errors
 
 
-def _validate_workspace_verification(task_id: str, task: dict[str, Any]) -> list[str]:
+def _validate_workspace_verification(
+    task_id: str,
+    task: dict[str, Any],
+    registry_revision: int,
+) -> list[str]:
+    """Validate that workspace evidence still covers the current task scope."""
     errors: list[str] = []
     verification = task.get("workspace_verification")
     if not isinstance(verification, dict):
         return [_error("REGISTRY_WORKSPACE_VERIFICATION_MISSING", f"{task_id} has no workspace verification record")]
     if verification.get("verified_by") != "coordinator":
         errors.append(_error("REGISTRY_WORKSPACE_VERIFIER_INVALID", f"{task_id} workspace evidence is not coordinator-owned"))
+
+    if verification.get("task_spec_revision") != task.get("task_spec_revision"):
+        errors.append(_error("REGISTRY_WORKSPACE_VERIFICATION_STALE", f"{task_id} workspace evidence is bound to a different task-spec revision"))
+
+    verified_revision = verification.get("verified_registry_revision")
+    if not isinstance(verified_revision, int) or isinstance(verified_revision, bool) or verified_revision < 1:
+        errors.append(_error("REGISTRY_WORKSPACE_VERIFICATION_REVISION_INVALID", f"{task_id} workspace evidence has an invalid registry revision"))
+    elif verified_revision > registry_revision:
+        errors.append(_error("REGISTRY_WORKSPACE_VERIFICATION_FUTURE_REVISION", f"{task_id} workspace evidence references a future registry revision"))
+
+    scope = verification.get("scope")
+    if not isinstance(scope, dict):
+        errors.append(_error("REGISTRY_WORKSPACE_SCOPE_MISSING", f"{task_id} workspace evidence has no read/write scope snapshot"))
+    else:
+        def normalised_paths(paths: Any) -> list[str] | None:
+            if not isinstance(paths, list):
+                return None
+            normalised = [_normalise_repo_path(path) for path in paths]
+            if any(path is None for path in normalised):
+                return None
+            return sorted(normalised)
+
+        for field in ("read_paths", "write_paths"):
+            recorded_paths = normalised_paths(scope.get(field))
+            current_paths = normalised_paths(task.get(field, []))
+            if recorded_paths is None or current_paths is None or recorded_paths != current_paths:
+                errors.append(_error("REGISTRY_WORKSPACE_SCOPE_MISMATCH", f"{task_id} workspace evidence does not match current {field}"))
+                break
 
     write_paths = task.get("write_paths", [])
     mode = verification.get("mode")
@@ -217,7 +250,6 @@ def _validate_workspace_verification(task_id: str, task: dict[str, Any]) -> list
         elif task.get("status") in {"ready", "active", "completed"}:
             errors.append(_error("REGISTRY_WORKSPACE_NOT_VERIFIED", f"{task_id} cannot be ready, active, or completed without verified workspace evidence"))
     return errors
-
 
 def _root_blockers(
     task_id: str,
@@ -474,7 +506,7 @@ def validate_registry_semantics(registry: dict[str, Any]) -> list[str]:
 
         criteria_ids = [item.get("id") for item in task.get("acceptance_criteria", []) if isinstance(item, dict)]
         errors.extend(_validate_coordinator_verification(task_id, task, criteria_ids, registry_revision))
-        errors.extend(_validate_workspace_verification(task_id, task))
+        errors.extend(_validate_workspace_verification(task_id, task, registry_revision))
         if len(criteria_ids) != len(set(criteria_ids)):
             errors.append(_error("REGISTRY_DUPLICATE_CRITERION_ID", f"{task_id} repeats a criterion ID"))
         slot_ids = [item.get("slot_id") for item in task.get("expected_artifacts", []) if isinstance(item, dict)]

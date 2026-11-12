@@ -15,7 +15,7 @@ class ContractSemanticTests(unittest.TestCase):
         errors, valid_count, invalid_count = validate_semantic_fixtures(ROOT)
         self.assertEqual(errors, [])
         self.assertEqual(valid_count, 6)
-        self.assertEqual(invalid_count, 38)
+        self.assertEqual(invalid_count, 41)
 
 
 if __name__ == "__main__":

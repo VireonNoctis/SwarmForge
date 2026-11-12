@@ -3,7 +3,7 @@
     {
       "name": "single-agent",
       "document": {
-        "schema_version": 2,
+        "schema_version": 3,
         "session_id": "sf-20261109-r10q6",
         "registry_revision": 3,
         "objective": "Publish machine-readable task and result contracts",
@@ -96,7 +96,20 @@
               "status": "verified",
               "workspace_ref": "workspace-shared",
               "evidence_ref": "workspace-evidence:sf-20261109-r10q6-01",
-              "verified_at": "2026-11-10T14:00:00Z"
+              "verified_at": "2026-11-10T14:00:00Z",
+              "task_spec_revision": 1,
+              "verified_registry_revision": 3,
+              "scope": {
+                "read_paths": [
+                  "docs/ORCHESTRATION_PATTERNS.md",
+                  "docs/ADAPTER_CONTRACT.md"
+                ],
+                "write_paths": [
+                  "docs/schemas/",
+                  "tests/fixtures/contracts/",
+                  "scripts/validate.py"
+                ]
+              }
             }
           }
         ]
@@ -105,7 +118,7 @@
     {
       "name": "worker-owned",
       "document": {
-        "schema_version": 2,
+        "schema_version": 3,
         "session_id": "sf-20261109-r10q6",
         "registry_revision": 4,
         "objective": "Publish machine-readable task and result contracts",
@@ -216,7 +229,20 @@
               "status": "verified",
               "workspace_ref": "workspace-shared",
               "evidence_ref": "workspace-evidence:sf-20261109-r10q6-01",
-              "verified_at": "2026-11-10T14:00:00Z"
+              "verified_at": "2026-11-10T14:00:00Z",
+              "task_spec_revision": 1,
+              "verified_registry_revision": 4,
+              "scope": {
+                "read_paths": [
+                  "docs/ORCHESTRATION_PATTERNS.md",
+                  "docs/ADAPTER_CONTRACT.md"
+                ],
+                "write_paths": [
+                  "docs/schemas/",
+                  "tests/fixtures/contracts/",
+                  "scripts/validate.py"
+                ]
+              }
             }
           }
         ]
@@ -227,7 +253,7 @@
     {
       "name": "missing-owner",
       "document": {
-        "schema_version": 2,
+        "schema_version": 3,
         "session_id": "sf-20261109-r10q6",
         "registry_revision": 3,
         "objective": "Publish machine-readable task and result contracts",
@@ -319,7 +345,20 @@
               "status": "verified",
               "workspace_ref": "workspace-shared",
               "evidence_ref": "workspace-evidence:sf-20261109-r10q6-01",
-              "verified_at": "2026-11-10T14:00:00Z"
+              "verified_at": "2026-11-10T14:00:00Z",
+              "task_spec_revision": 1,
+              "verified_registry_revision": 3,
+              "scope": {
+                "read_paths": [
+                  "docs/ORCHESTRATION_PATTERNS.md",
+                  "docs/ADAPTER_CONTRACT.md"
+                ],
+                "write_paths": [
+                  "docs/schemas/",
+                  "tests/fixtures/contracts/",
+                  "scripts/validate.py"
+                ]
+              }
             }
           }
         ]
@@ -328,7 +367,7 @@
     {
       "name": "unknown-state",
       "document": {
-        "schema_version": 2,
+        "schema_version": 3,
         "session_id": "sf-20261109-r10q6",
         "registry_revision": 3,
         "objective": "Publish machine-readable task and result contracts",
@@ -421,7 +460,124 @@
               "status": "verified",
               "workspace_ref": "workspace-shared",
               "evidence_ref": "workspace-evidence:sf-20261109-r10q6-01",
-              "verified_at": "2026-11-10T14:00:00Z"
+              "verified_at": "2026-11-10T14:00:00Z",
+              "task_spec_revision": 1,
+              "verified_registry_revision": 3,
+              "scope": {
+                "read_paths": [
+                  "docs/ORCHESTRATION_PATTERNS.md",
+                  "docs/ADAPTER_CONTRACT.md"
+                ],
+                "write_paths": [
+                  "docs/schemas/",
+                  "tests/fixtures/contracts/",
+                  "scripts/validate.py"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "missing-workspace-scope-snapshot",
+      "document": {
+        "schema_version": 3,
+        "session_id": "sf-20261109-r10q6",
+        "registry_revision": 3,
+        "objective": "Publish machine-readable task and result contracts",
+        "requested_worker_cap": 2,
+        "tasks": [
+          {
+            "id": "sf-20261109-r10q6-01",
+            "task_spec_revision": 1,
+            "owner": "coordinator",
+            "objective": "Define and validate portable JSON Schema contracts",
+            "context_refs": [
+              "SKILL.md",
+              "docs/ORCHESTRATION_PATTERNS.md"
+            ],
+            "read_paths": [
+              "docs/ORCHESTRATION_PATTERNS.md",
+              "docs/ADAPTER_CONTRACT.md"
+            ],
+            "write_paths": [
+              "docs/schemas/",
+              "tests/fixtures/contracts/",
+              "scripts/validate.py"
+            ],
+            "depends_on": [],
+            "status": "ready",
+            "state_history": [
+              {
+                "from": null,
+                "to": "ready",
+                "actor": "coordinator",
+                "recorded_at": "2026-11-09T15:49:00Z",
+                "registry_revision": 3,
+                "reason": "No dependencies; the task is ready to start",
+                "evidence_refs": []
+              }
+            ],
+            "acceptance_criteria": [
+              {
+                "id": "AC-01",
+                "description": "Both schemas validate against Draft 2020-12 and fixtures",
+                "verification": "python3 scripts/validate.py"
+              }
+            ],
+            "expected_artifacts": [
+              {
+                "slot_id": "OUT-01",
+                "kind": "schema_bundle",
+                "required": true,
+                "allowed_paths": [
+                  "docs/schemas/",
+                  "tests/fixtures/contracts/"
+                ],
+                "satisfies": [
+                  "AC-01"
+                ]
+              }
+            ],
+            "verification_commands": [
+              "python3 scripts/validate.py",
+              "python3 -m unittest discover -s tests -v"
+            ],
+            "deliverable": "Versioned schemas and validated fixture bundle",
+            "worker_session_id": null,
+            "worker_status": null,
+            "result_ref": null,
+            "attempts": [],
+            "blocked_by": [],
+            "recovery_decision": null,
+            "coordinator_verification": {
+              "verified_by": "coordinator",
+              "task_spec_revision": 1,
+              "attempt_id": null,
+              "verified_registry_revision": 3,
+              "result_correlation": "pending",
+              "artifact_integrity": "pending",
+              "criterion_outcomes": {
+                "AC-01": "pending"
+              },
+              "criterion_evidence_refs": {
+                "AC-01": []
+              },
+              "accepted": false,
+              "accepted_at": null,
+              "verified_at": null,
+              "evidence_refs": []
+            },
+            "workspace_verification": {
+              "verified_by": "coordinator",
+              "mode": "shared_serialized",
+              "status": "verified",
+              "workspace_ref": "workspace-shared",
+              "evidence_ref": "workspace-evidence:sf-20261109-r10q6-01",
+              "verified_at": "2026-11-10T14:00:00Z",
+              "task_spec_revision": 1,
+              "verified_registry_revision": 3
             }
           }
         ]

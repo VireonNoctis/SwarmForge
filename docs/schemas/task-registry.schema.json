@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/VireonNoctis/SwarmForge/main/docs/schemas/task-registry.schema.json",
-  "title": "SwarmForge task registry v2",
-  "description": "Structural contract for one session-local task registry. Version 2 adds coordinator-owned acceptance and workspace verification records; graph and lifecycle invariants still require semantic validation.",
+  "title": "SwarmForge task registry v3",
+  "description": "Structural contract for one session-local task registry. Version 3 binds coordinator-owned workspace evidence to the task-spec revision and exact read/write path scope; graph and lifecycle invariants still require semantic validation.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -14,7 +14,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": 2
+      "const": 3
     },
     "session_id": {
       "$ref": "#/$defs/identifier"
@@ -576,6 +576,9 @@
         "verified_by",
         "mode",
         "status",
+        "task_spec_revision",
+        "verified_registry_revision",
+        "scope",
         "workspace_ref",
         "evidence_ref",
         "verified_at"
@@ -631,8 +634,33 @@
               "format": "date-time"
             }
           ]
+        },
+        "task_spec_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "verified_registry_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "read_paths",
+            "write_paths"
+          ],
+          "properties": {
+            "read_paths": {
+              "$ref": "#/$defs/repository_path_list"
+            },
+            "write_paths": {
+              "$ref": "#/$defs/repository_path_list"
+            }
+          }
         }
-      }
+      },
+      "description": "Coordinator-owned workspace evidence bound to the task-spec revision, registry revision, and exact read/write path scope."
     }
   }
 }

@@ -429,18 +429,28 @@ class SkillPackageTests(unittest.TestCase):
             with self.subTest(skill_phrase=phrase):
                 self.assertIn(phrase.lower(), skill.lower())
 
-    def test_registry_v2_requires_coordinator_and_workspace_evidence(self) -> None:
+    def test_registry_v3_binds_workspace_evidence_to_current_scope(self) -> None:
         schema = json.loads(
             (ROOT / "docs" / "schemas" / "task-registry.schema.json").read_text(
                 encoding="utf-8"
             )
         )
         task = schema["$defs"]["task"]
-        self.assertEqual(schema["properties"]["schema_version"]["const"], 2)
+        self.assertEqual(schema["properties"]["schema_version"]["const"], 3)
         for field in ("coordinator_verification", "workspace_verification"):
             with self.subTest(field=field):
                 self.assertIn(field, task["required"])
                 self.assertIn(field, task["properties"])
+
+        workspace = schema["$defs"]["workspace_verification"]
+        for field in ("task_spec_revision", "verified_registry_revision", "scope"):
+            with self.subTest(workspace_field=field):
+                self.assertIn(field, workspace["required"])
+                self.assertIn(field, workspace["properties"])
+        self.assertEqual(
+            set(workspace["properties"]["scope"]["required"]),
+            {"read_paths", "write_paths"},
+        )
 
     def test_skill_metadata_names_the_skill(self) -> None:
         text = (ROOT / "SKILL.md").read_text(encoding="utf-8")

@@ -45,7 +45,7 @@ Generate a unique session ID for each invocation, then number tasks within it (f
 Use this compact record:
 
 ~~~yaml
-schema_version: 2
+schema_version: 3
 session_id: "sf-20261031-x7k2"
 registry_revision: 1
 objective: "Deliver the user's requested outcome"
@@ -111,6 +111,13 @@ tasks:
       verified_by: "coordinator"
       mode: "read_only"
       status: "not_required"
+      task_spec_revision: 1
+      verified_registry_revision: 1
+      scope:
+        read_paths:
+          - "docs/ORCHESTRATION_PATTERNS.md"
+          - "tests/test_skill_package.py"
+        write_paths: []
       workspace_ref: null
       evidence_ref: null
       verified_at: null
@@ -118,9 +125,9 @@ tasks:
 
 ### Machine-readable contract schemas
 
-The registry example above is version 2 and has a structural schema at [task-registry.schema.json](schemas/task-registry.schema.json). Registry v2 is a breaking structural revision: migrate each v1 task by adding `coordinator_verification` and `workspace_verification` records, then set the registry `schema_version` to 2. The portable worker result envelope remains schema version 1 and is described by [result-envelope.schema.json](schemas/result-envelope.schema.json). Valid and intentionally invalid examples are collected in [the contract fixtures](../tests/fixtures/contracts/).
+The registry example above is version 3 and has a structural schema at [task-registry.schema.json](schemas/task-registry.schema.json). Registry v3 is a breaking structural revision: migrate v2 tasks by adding `task_spec_revision`, `verified_registry_revision`, and a `scope` snapshot containing the exact `read_paths` and `write_paths` to each `workspace_verification` record, then set the registry `schema_version` to 3. Preserve the existing `coordinator_verification` records. The portable worker result envelope remains schema version 1 and is described by [result-envelope.schema.json](schemas/result-envelope.schema.json). Valid and intentionally invalid examples are collected in [the contract fixtures](../tests/fixtures/contracts/).
 
-CI validates both schemas against JSON Schema Draft 2020-12 and checks every named structural fixture with the pinned maintainer-only validator dependency. It also runs the reusable semantic cases in [semantic.json](../tests/fixtures/contracts/semantic.json): six valid examples and 38 intentionally invalid cases. Registry v2 requires a coordinator-owned verification record bound to the task-spec revision and latest attempt, with per-criterion outcomes and evidence references. It also requires explicit workspace evidence: read-only tasks declare no write paths; writable tasks must record a verified isolated or shared-serialized workspace before becoming ready, active, or completed. The maintainer-side semantic checker covers task identity, dependency references and cycles, isolated-workspace uniqueness, overlapping writes, state-history transitions, attempt lineage and unresolved attempts, derived blockers, coordinator acceptance, result-to-attempt correlation, artifact-slot and producer matching, path scope, and evidence completeness.
+CI validates both schemas against JSON Schema Draft 2020-12 and checks every named structural fixture with the pinned maintainer-only validator dependency. It also runs the reusable semantic cases in [semantic.json](../tests/fixtures/contracts/semantic.json): six valid examples and 41 intentionally invalid cases. Registry v3 requires coordinator-owned acceptance evidence bound to the current task-spec revision and latest attempt. Workspace verification is also bound to the current task-spec revision and an exact snapshot of normalized read/write paths; its `verified_registry_revision` must not be in the future. A task-spec revision change or any read/write scope change invalidates the prior workspace record until the coordinator records fresh evidence. Read-only tasks declare no write paths; writable tasks must record a verified isolated or shared-serialized workspace before becoming ready, active, or completed. The maintainer-side semantic checker covers task identity, dependency references and cycles, isolated-workspace uniqueness, overlapping writes, state-history transitions, attempt lineage and unresolved attempts, derived blockers, coordinator acceptance, workspace-evidence freshness and scope matching, result-to-attempt correlation, artifact-slot and producer matching, path scope, and evidence completeness.
 
 These checks operate on supplied JSON records; they are not a host runtime. They cannot prove that an owner or worker ID was genuinely issued by a host, retrieve artifacts, inspect actual artifact kinds or symlinks, recompute a digest over retrieved bytes, resolve an external artifact store, or establish that coordinator evidence is truthful. Those checks remain the responsibility of the coordinator and the connected host. A structurally and semantically valid fixture is not proof that a live dispatch or artifact is safe to accept.
 
@@ -249,7 +256,7 @@ acceptance_evidence:
     verification_command: "<exact command or inspection method>"
 ~~~
 
-Every task carries a coordinator-owned `coordinator_verification` record in registry v2; worker-supplied verification claims are never authoritative. The record is bound to the task-spec revision and latest attempt, and each non-pending criterion outcome must have evidence references:
+Every task carries a coordinator-owned `coordinator_verification` record in registry v3; worker-supplied verification claims are never authoritative. The record is bound to the task-spec revision and latest attempt, and each non-pending criterion outcome must have evidence references:
 
 ~~~yaml
 coordinator_verification:

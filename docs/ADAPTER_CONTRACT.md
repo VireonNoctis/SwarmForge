@@ -391,19 +391,24 @@ Preferred write models:
 3. isolated container plus patch artifact;
 4. shared workspace with explicit writer ownership and serialized integration.
 
-Registry v2 records the coordinator's workspace assessment on every task:
+Registry v3 binds the coordinator's workspace assessment to the current task specification and path scope:
 
 ~~~yaml
 workspace_verification:
   verified_by: "coordinator"
   mode: "read_only|isolated|shared_serialized"
   status: "not_required|verified|unverified|failed"
+  task_spec_revision: 1
+  verified_registry_revision: 3
+  scope:
+    read_paths: ["docs/ORCHESTRATION_PATTERNS.md"]
+    write_paths: []
   workspace_ref: "<opaque host/workspace reference, or null>"
   evidence_ref: "<redacted observation or ownership record, or null>"
   verified_at: "<timestamp, or null>"
 ~~~
 
-A writable task cannot become ready, active, or completed until the record is verified. Overlapping write paths are safe only when both tasks have distinct verified isolated workspace references. A shared workspace requires non-overlapping ownership and serialized integration. Read-only tasks declare no write paths. The record describes observed host isolation or coordinator-enforced ownership; it does not make an adapter's assertion self-proving.
+The record's `task_spec_revision` must match the task and its `scope` must exactly match the normalized current `read_paths` and `write_paths`; `verified_registry_revision` must not exceed the registry revision being validated. Any task-spec revision or path-scope change invalidates the prior workspace evidence until it is refreshed. A writable task cannot become ready, active, or completed until the record is verified. Overlapping write paths are safe only when both tasks have distinct verified isolated workspace references. A shared workspace requires non-overlapping ownership and serialized integration. Read-only tasks declare no write paths. The record describes observed host isolation or coordinator-enforced ownership; it does not make an adapter's assertion self-proving.
 
 The adapter must make the active model visible. Workers must not assume every session shares a filesystem.
 
